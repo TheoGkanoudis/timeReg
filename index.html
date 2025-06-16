@@ -5,22 +5,52 @@
    <meta charset="UTF-8">
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
    <title>TimeReg</title>
+   <link rel="icon" href="./favicon.ico`" type="image/x-icon">
+   <link rel="stylesheet" href="./fontawesome/fontawesome.css">
    <link rel="stylesheet" href="./styles.css">
-   <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
-      crossorigin="anonymous"></script>
+   <link rel="preconnect" href="https://rsms.me/">
+   <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+
+   <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
 </head>
 
 <body>
-   <header>
-      <h1>Welcome to TimeReg</h1>
-      <h2>Hello, Anders</h2>
-   </header>
+   <nav id="sidebar"></nav>
    <main>
-      <p>Example</p>
+      <div class="card">
+         <section id="topbar">
+            <h1 id="logoTitle" class="title"><i class="far fa-clock"></i>TimeReg</h1>
+            <ul id="timeframeSelector">
+               <li><button data-timeframe="month"><i class="fas fa-calendar-days"></i><span>Month</span></button></li>
+               <li><button data-timeframe="week"><i class="fas fa-calendar-week"></i><span>Week</span></button></li>
+               <li><button data-timeframe="day"><i class="fas fa-calendar-day"></i><span>Day</span></button></li>
+            </ul>
+         </section>
+         <section id="content">
+            <div class="calendar-container inner-card">
+               <div class="calendar-head">
+                  <button id="prevMonth"><i class="fas fa-chevron-left"></i></button>
+                  <span id="currentMonth" class="loading">test</span>
+                  <button id="nextMonth"><i class="fas fa-chevron-right"></i></button>
+               </div>
+               <div class="calendar-body">
+                  <div class="calendar-body-header">
+                     <span>M</span>
+                     <span>T</span>
+                     <span>W</span>
+                     <span>T</span>
+                     <span>F</span>
+                     <span>S</span>
+                     <span>S</span>
+                  </div>
+                  <div id="calendar" class="calendar-body-grid loading">
+
+                  </div>
+               </div>
+            </div>
+         </section>
+      </div>
    </main>
-   <footer>
-      <p>&copy; 2023 TimeReg</p>
-   </footer>
    <script src="./script.js" type="module" crossorigin="anonymous"></script>
 </body>
 

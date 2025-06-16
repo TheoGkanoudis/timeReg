@@ -1,0 +1,198 @@
+:root {
+   /* colors */
+   --main-background: #e9e9f3;
+   --main-color: #1e1e29;
+   --card-background: #ffffff;
+   --card-color: #1b232d;
+   --outline-color: #d0d0e2;
+   --inner-card-background: #f4f4f9;
+   --inner-card-color: #1b232d;
+
+   /* buttons */
+   --button-background-hover: #f2efff;
+   --button-background-active: #e2dcfb;
+
+   /* dimensions */
+   --card-radius: 32px;
+   --card-padding: 16px 16px;
+   --inner-card-radius: 8px;
+   --inner-card-padding: 8px;
+   --sidebar-width: 80px;
+
+   /* transition */
+   --transition-duration: 0.2s;
+   --transition-opts: var(--transition-duration) ease;
+
+   /* calendar */
+   --calendar-day-size: 32px;
+
+   @media (prefers-reduced-motion: reduce) {
+      --transition-opts: none;
+   }
+}
+
+:root {
+   font-family: Inter, sans-serif;
+   font-feature-settings: 'liga' 1, 'calt' 1, "ss01" 1, "sso4" 1, "cs01" 1, "cv06" 1, "cv08" 1, "cv10" 1, "cv11" 1, "cv13" 1;
+   font-weight: 450;
+
+   @supports (font-variation-settings: normal) {
+      font-family: InterVariable, sans-serif;
+   }
+}
+
+body {
+   display: flex;
+   flex-direction: row;
+   background: var(--main-background);
+   color: var(--main-color);
+   margin: 0;
+}
+
+#sidebar {
+   height: 100vh;
+   width: var(--sidebar-width);
+}
+
+main {
+   margin: 8px;
+   display: flex;
+   flex-direction: column;
+   flex: 1;
+}
+
+button {
+   all: initial;
+   font: inherit;
+   color: inherit;
+   cursor: pointer;
+}
+
+.card {
+   background-color: var(--card-background);
+   color: var(--card-color);
+   border-radius: var(--card-radius);
+   padding: var(--card-padding);
+   display: flex;
+   flex-direction: column;
+   flex: 1;
+
+   & .title {
+      font-size: 1.2rem;
+      font-weight: 650;
+      letter-spacing: .02rem;
+      margin: 0;
+
+      &#logoTitle {
+         font-size: 1.8rem;
+         font-weight: 760;
+         display: flex;
+         align-items: baseline;
+         gap: 4px;
+         padding-inline: 8px;
+      }
+   }
+}
+
+.inner-card {
+   background-color: var(--inner-card-background);
+   color: var(--inner-card-color);
+   border-radius: var(--inner-card-radius);
+   padding: var(--inner-card-padding);
+}
+
+#topbar {
+   display: flex;
+   align-items: center;
+   padding-bottom: 8px;
+   border-bottom: 1px solid var(--outline-color);
+
+   & ul {
+      font-weight: 600;
+      margin-inline-start: auto;
+      margin-block: 0;
+      padding: 0;
+      display: flex;
+      list-style: none;
+      gap: 12px;
+
+      & button {
+         display: flex;
+         align-items: center;
+         padding-inline: 16px;
+         height: 40px;
+         gap: 8px;
+         border-radius: 20px;
+         transition: background-color var(--transition-opts);
+
+         & span,
+         i {
+            height: 16px;
+         }
+
+         &:hover {
+            background-color: var(--button-background-hover);
+         }
+
+         &.active {
+            background-color: var(--button-background-active);
+         }
+      }
+   }
+}
+
+#content {
+   display: flex;
+   gap: 8px;
+   flex: 1;
+   padding-top: 16px;
+
+   & .calendar-container {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      height: fit-content;
+
+      & .calendar-head {
+         display: flex;
+         align-items: center;
+         justify-content: space-between;
+
+         & #currentMonth {
+            font-weight: 600;
+            font-size: 1.2rem;
+            line-height: 1.5;
+         }
+
+         & button {
+            width: var(--calendar-day-size);
+            text-align: center;
+            line-height: 1.8;
+         }
+      }
+
+      & .calendar-body {
+
+         & .calendar-body-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-weight: 600;
+            gap: 4px;
+         }
+
+         & .calendar-body-grid {
+            display: grid;
+            grid-template-columns: repeat(7, var(--calendar-day-size));
+            grid-template-rows: repeat(6, var(--calendar-day-size));
+            gap: 4px;
+            padding: 4px;
+         }
+
+         & span {
+            width: var(--calendar-day-size);
+            text-align: center;
+         }
+      }
+   }
+}
