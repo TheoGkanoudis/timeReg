@@ -3,20 +3,22 @@
    --main-background: #e9e9f3;
    --main-color: #1e1e29;
    --card-background: #ffffff;
-   --card-color: #1b232d;
+   --card-color: #1b1b2d;
    --outline-color: #d0d0e2;
-   --inner-card-background: #f4f4f9;
-   --inner-card-color: #1b232d;
+   --inner-card-background: #eeeeff;
+   --inner-card-color: #1b1b2d;
+   --disabled-color: #91919c;
 
    /* buttons */
-   --button-background-hover: #f2efff;
-   --button-background-active: #e2dcfb;
+   --button-background-hover: #eeeeff;
+   --button-background-active: #ddddff;
+   --button-background-selected: #5f5f97;
 
    /* dimensions */
    --card-radius: 32px;
-   --card-padding: 16px 16px;
+   --card-padding: 16px 20px;
    --inner-card-radius: 8px;
-   --inner-card-padding: 8px;
+   --inner-card-padding: 8px 12px;
    --sidebar-width: 80px;
 
    /* transition */
@@ -24,7 +26,9 @@
    --transition-opts: var(--transition-duration) ease;
 
    /* calendar */
-   --calendar-day-size: 32px;
+   --calendar-day-size: 30px;
+   --calendar-gap: 4px;
+   --calendar-font-size: 0.85rem;
 
    @media (prefers-reduced-motion: reduce) {
       --transition-opts: none;
@@ -159,7 +163,13 @@ button {
          justify-content: space-between;
 
          & #currentMonth {
-            font-weight: 600;
+            font-weight: 720;
+            font-size: 1.2rem;
+            line-height: 1.5;
+         }
+
+         & #currentYear {
+            font-weight: 300;
             font-size: 1.2rem;
             line-height: 1.5;
          }
@@ -178,21 +188,77 @@ button {
             align-items: center;
             justify-content: space-between;
             font-weight: 600;
-            gap: 4px;
-         }
-
-         & .calendar-body-grid {
-            display: grid;
-            grid-template-columns: repeat(7, var(--calendar-day-size));
-            grid-template-rows: repeat(6, var(--calendar-day-size));
-            gap: 4px;
-            padding: 4px;
+            margin-bottom: 8px;
          }
 
          & span {
             width: var(--calendar-day-size);
-            text-align: center;
+            height: var(--calendar-day-size);
+            font-size: var(--calendar-font-size);
+            border-radius: calc(var(--calendar-day-size) / 2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
          }
+
+         & .week {
+            display: flex;
+            border-radius: calc(var(--calendar-day-size) / 2 + 4px);
+            gap: var(--calendar-gap);
+            box-sizing: border-box;
+            border: 2px solid transparent;
+         }
+
+         & .day {
+            border: 2px solid transparent;
+            border-radius: calc(var(--calendar-day-size) / 2 + 4px);
+            cursor: pointer;
+
+            & span {
+               transition: background-color var(--transition-opts);
+            }
+
+            &.prev,
+            &.next {
+               color: var(--disabled-color);
+            }
+         }
+      }
+   }
+
+   &[view="day"] .day {
+
+      &:hover {
+         background-color: var(--button-background-active);
+      }
+
+      &.active {
+         border: 2px solid var(--card-color);
+         box-sizing: border-box;
+         background-color: var(--button-background-active);
+      }
+
+      &.today {
+         background-color: var(--button-background-selected);
+         color: var(--inner-card-background);
+      }
+   }
+
+   &[view="week"] .week {
+
+      &:hover {
+         background-color: var(--button-background-active);
+      }
+
+      &:has(.active) {
+         border: 2px solid var(--card-color);
+         background-color: var(--button-background-active);
+      }
+
+      & .today span {
+         background-color: var(--button-background-selected);
+         color: var(--inner-card-background);
       }
    }
 }

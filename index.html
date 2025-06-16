@@ -30,17 +30,20 @@
             <div class="calendar-container inner-card">
                <div class="calendar-head">
                   <button id="prevMonth"><i class="fas fa-chevron-left"></i></button>
-                  <span id="currentMonth" class="loading">test</span>
+                  <div class="calendar-head-title">
+                     <span id="currentMonth" class="loading"></span>
+                     <span id="currentYear" class="loading"></span>
+                  </div>
                   <button id="nextMonth"><i class="fas fa-chevron-right"></i></button>
                </div>
                <div class="calendar-body">
                   <div class="calendar-body-header">
+                     <span id="sunday">S</span>
                      <span>M</span>
                      <span>T</span>
                      <span>W</span>
                      <span>T</span>
                      <span>F</span>
-                     <span>S</span>
                      <span>S</span>
                   </div>
                   <div id="calendar" class="calendar-body-grid loading">
