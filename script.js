@@ -1,6 +1,12 @@
 import { getCookie, setCookie } from "./utils.js";
+const transitionDuration =
+   parseFloat($(":root").css("--transition-duration")) * 1000;
 
 const weekBeginsOnMonday = true;
+const workDayStart = 9;
+const workDayEnd = 17;
+var selectedDay = new Date();
+var selectedWeekStart, selectedWeekEnd;
 
 $(function () {
    initView();
@@ -18,21 +24,27 @@ function initView() {
 }
 
 function initCalendar() {
-   setMonth();
+   setMonth(true);
+   setTimetable();
 }
 
 function initListeners() {
    $(timeframeSelector).find("button").on("click", setTimeframe);
    $(calendar).on("click", changeDay);
    $(prevMonth).on("click", () =>
-      setMonth(parseInt($(calendar).attr("distance")) - 1)
+      setMonth(false, parseInt($(calendar).attr("distance")) - 1)
    );
    $(nextMonth).on("click", () =>
-      setMonth(parseInt($(calendar).attr("distance")) + 1)
+      setMonth(false, parseInt($(calendar).attr("distance")) + 1)
    );
+   $(reset).on("click", function () {
+      selectedDay = new Date();
+      setMonth(true, 0);
+      setTimetable();
+   });
 }
 
-function setMonth(distance = 0) {
+function setMonth(boot, distance = 0) {
    const date = new Date();
    const month = date.getMonth();
    const year = date.getFullYear();
@@ -43,8 +55,9 @@ function setMonth(distance = 0) {
    const yearNo = selectedMonth.getFullYear();
    const monthNo = selectedMonth.getMonth();
    const dayNo = date.getDate();
-   $(currentMonth).text(monthName).removeClass("loading");
-   $(currentYear).text(yearNo).removeClass("loading");
+
+   $(currentMonth).text(monthName);
+   $(currentYear).text(yearNo);
 
    //set the calendar content
    $(calendar).empty();
@@ -99,6 +112,14 @@ function setMonth(distance = 0) {
                monthText = 1;
             }
          }
+         //weekends
+         if (
+            d === 6 ||
+            (weekBeginsOnMonday && d === 5) ||
+            (!weekBeginsOnMonday && d === 0)
+         ) {
+            currentDay.addClass("holiday weekend");
+         }
 
          const daySpan = $("<span>").text(dayText);
          currentDay
@@ -110,12 +131,65 @@ function setMonth(distance = 0) {
       $(calendar).append(currentWeek);
    }
 
+   //set current day
    if (distance === 0) {
       $(calendar)
          .find(`.day[data-date="${dayNo}-${month + 1}-${year}"]`)
-         .addClass("active today");
+         .addClass("today");
    }
+   //set active day
+   $(calendar)
+      .find(
+         `.day[data-date="${selectedDay.getDate()}-${
+            selectedDay.getMonth() + 1
+         }-${selectedDay.getFullYear()}"]`
+      )
+      .addClass("active");
+   if (boot) {
+      setActiveWeek();
+   }
+
    $(calendar).attr("distance", distance);
+}
+
+function setTimetable() {
+   //day timetable
+   const dayName = selectedDay.toLocaleString("default", {
+      weekday: "short",
+   });
+   const dateNo = selectedDay.toLocaleDateString("default", {
+      day: "numeric",
+   });
+   const monthName = selectedDay.toLocaleString("default", {
+      month: "short",
+   });
+
+   $(timetableDay).find(".month").text(monthName);
+   $(timetableDay).find(".date").text(dateNo);
+   $(timetableDay).find(".day").text(dayName);
+   setDayTimetable();
+
+   //week timetable
+   const startMonthName = selectedWeekStart.toLocaleString("default", {
+      month: "short",
+   });
+   const startDateNo = selectedWeekStart.toLocaleDateString("default", {
+      day: "numeric",
+   });
+   const endMonthName = selectedWeekEnd.toLocaleString("default", {
+      month: "short",
+   });
+   const endDateNo = selectedWeekEnd.toLocaleDateString("default", {
+      day: "numeric",
+   });
+
+   $(timetableWeek).find(".start-month").text(startMonthName);
+   $(timetableWeek).find(".start-date").text(startDateNo);
+   $(timetableWeek)
+      .find(".end-month")
+      .text(startMonthName == endMonthName ? "" : endMonthName);
+   $(timetableWeek).find(".end-date").text(endDateNo);
+   setWeekTimetable();
 }
 
 function setTimeframe(e) {
@@ -136,6 +210,60 @@ function changeDay(e) {
    if (!target.hasClass("day")) {
       return;
    }
+   //set selected day
+   const dateParts = target.data("date").split("-");
+   selectedDay = new Date(
+      parseInt(dateParts[2]),
+      parseInt(dateParts[1]) - 1,
+      parseInt(dateParts[0])
+   );
+
+   // if selected day in other month, change month
+   if (target.is(".prev, .next")) {
+      setMonth(
+         false,
+         parseInt($(calendar).attr("distance")) + (target.is(".prev") ? -1 : 1)
+      );
+      target = $(calendar).find(`.day[data-date="${target.data("date")}"]`);
+   }
+
+   //select day
    $(calendar).find(".active").removeClass("active");
    target.addClass("active");
+   setActiveWeek();
+   setTimetable();
 }
+
+function setActiveWeek() {
+   const newActive = $(calendar).find(
+      `.day[data-date="${selectedDay.getDate()}-${
+         selectedDay.getMonth() + 1
+      }-${selectedDay.getFullYear()}"]`
+   );
+   //set selected week
+   const firstOfWeek = newActive
+      .parent()
+      .find(".day")
+      .first()
+      .data("date")
+      .split("-");
+
+   const lastOfWeek = newActive
+      .parent()
+      .find(".day")
+      .last()
+      .data("date")
+      .split("-");
+
+   selectedWeekStart = new Date(
+      firstOfWeek[2],
+      firstOfWeek[1] - 1,
+      firstOfWeek[0]
+   );
+
+   selectedWeekEnd = new Date(lastOfWeek[2], lastOfWeek[1] - 1, lastOfWeek[0]);
+}
+
+function setDayTimetable() {}
+
+function setWeekTimetable() {}

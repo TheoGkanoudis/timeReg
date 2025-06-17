@@ -31,8 +31,8 @@
                <div class="calendar-head">
                   <button id="prevMonth"><i class="fas fa-chevron-left"></i></button>
                   <div class="calendar-head-title">
-                     <span id="currentMonth" class="loading"></span>
-                     <span id="currentYear" class="loading"></span>
+                     <span id="currentMonth"></span>
+                     <span id="currentYear"></span>
                   </div>
                   <button id="nextMonth"><i class="fas fa-chevron-right"></i></button>
                </div>
@@ -46,9 +46,33 @@
                      <span>F</span>
                      <span>S</span>
                   </div>
-                  <div id="calendar" class="calendar-body-grid loading">
+                  <div id="calendar" class="calendar-body-grid">
 
                   </div>
+               </div>
+            </div>
+
+            <div class="timetable-container">
+               <div class="timetable-header">
+                  <div class="inner-card reset">
+                     <button id="reset"><i class="fas fa-refresh"></i></button>
+                  </div>
+                  <div id="timetableDay" class="inner-card">
+                     <span class="month"></span>
+                     <span class="date"></span>
+                     <span class="day"></span>
+                  </div>
+                  <div id="timetableWeek" class="inner-card">
+                     <span class="start-month"></span>
+                     <span class="end-month"></span>
+                     <span class="start-date"></span>
+                     <span class="dash">-</span>
+                     <span class="end-date"></span>
+                  </div>
+                  <div id="timetableMonth" class="inner-card"></div>
+               </div>
+               <div class="timetable-body">
+                  <div id="timetable"></div>
                </div>
             </div>
          </section>
