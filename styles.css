@@ -5,6 +5,7 @@
    --card-background: #ffffff;
    --card-color: #1b1b2d;
    --outline-color: #d0d0e2;
+   --border-color: #5d5772;
    --inner-card-background: #eeeeff;
    --inner-card-color: #1b1b2d;
    --disabled-color: #91919c;
@@ -12,7 +13,7 @@
    /* buttons */
    --button-background-hover: #eeeeff;
    --button-background-active: #ddddff;
-   --button-background-selected: #5f5f97;
+   --button-background-selected: #8888b4;
 
    /* dimensions */
    --card-radius: 32px;
@@ -149,7 +150,7 @@ button {
    display: flex;
    gap: 8px;
    flex: 1;
-   padding-top: 16px;
+   padding-top: 12px;
 
    & .calendar-container {
       display: flex;
@@ -211,9 +212,9 @@ button {
          }
 
          & .day {
+            cursor: pointer;
             border: 2px solid transparent;
             border-radius: calc(var(--calendar-day-size) / 2 + 4px);
-            cursor: pointer;
 
             & span {
                transition: background-color var(--transition-opts);
@@ -234,12 +235,17 @@ button {
       }
 
       &.active {
-         border: 2px solid var(--card-color);
+         border-color: var(--border-color);
          box-sizing: border-box;
          background-color: var(--button-background-active);
+
+         &.today {
+            border-color: transparent;
+            background-color: var(--border-color);
+         }
       }
 
-      &.today {
+      &.today span {
          background-color: var(--button-background-selected);
          color: var(--inner-card-background);
       }
@@ -252,7 +258,7 @@ button {
       }
 
       &:has(.active) {
-         border: 2px solid var(--card-color);
+         border-color: var(--border-color);
          background-color: var(--button-background-active);
       }
 
