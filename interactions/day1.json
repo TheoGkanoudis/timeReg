@@ -1,0 +1,144 @@
+{
+  "workDay": [
+    {
+      "appName": "Microsoft Outlook",
+      "description": "Reviewing emails and scheduling meetings.",
+      "timeA": 800,
+      "timeB": 825,
+      "xConfidence": 0
+    },
+    {
+      "appName": "Microsoft Word",
+      "description": "Drafting a legal memo on contract law.",
+      "timeA": 825,
+      "timeB": 912,
+      "xConfidence": 0.85
+    },
+    {
+      "appName": "LexisNexis",
+      "description": "Conducting legal research on case precedents.",
+      "timeA": 912,
+      "timeB": 947,
+      "xConfidence": 0.9
+    },
+    {
+      "appName": "Microsoft Outlook",
+      "description": "Responding to client emails and checking calendar.",
+      "timeA": 947,
+      "timeB": 959,
+      "xConfidence": 0.78
+    },
+    {
+      "appName": "Microsoft Teams",
+      "description": "Participating in a virtual meeting with a client.",
+      "timeA": 959,
+      "timeB": 1041,
+      "xConfidence": 0.95
+    },
+    {
+      "appName": "Microsoft Word",
+      "description": "Revising the contract draft based on research.",
+      "timeA": 1041,
+      "timeB": 1128,
+      "xConfidence": 0.92
+    },
+    {
+      "appName": "Adobe Acrobat",
+      "description": "Reviewing a PDF document.",
+      "timeA": 1128,
+      "timeB": 1142,
+      "xConfidence": 0.75
+    },
+    {
+      "appName": "Microsoft Outlook",
+      "description": "Scheduling a follow up meeting with the client.",
+      "timeA": 1142,
+      "timeB": 1148,
+      "xConfidence": 0.8
+    },
+    {
+      "appName": "LexisNexis",
+      "description": "Checking the latest updates of case precedents.",
+      "timeA": 1148,
+      "timeB": 1205,
+      "xConfidence": 0.6
+    },
+    {
+      "appName": "Microsoft Word",
+      "description": "Editing a new document.",
+      "timeA": 1205,
+      "timeB": 1243,
+      "xConfidence": 0.9
+    },
+    {
+      "appName": "Microsoft Teams",
+      "description": "Attending a quick internal meeting.",
+      "timeA": 1243,
+      "timeB": 1244,
+      "xConfidence": 0.97
+    },
+    {
+      "appName": "Microsoft Outlook",
+      "description": "Preparing the lunch break reminder.",
+      "timeA": 1244,
+      "timeB": 1300,
+      "xConfidence": 0.65
+    },
+    {
+      "appName": "Microsoft Outlook",
+      "description": "Checking and responding to urgent emails.",
+      "timeA": 1300,
+      "timeB": 1310,
+      "xConfidence": 0.92
+    },
+    {
+      "appName": "Microsoft Word",
+      "description": "Drafting a settlement agreement.",
+      "timeA": 1310,
+      "timeB": 1422,
+      "xConfidence": 0.95
+    },
+    {
+      "appName": "LexisNexis",
+      "description": "Reviewing legal articles.",
+      "timeA": 1422,
+      "timeB": 1501,
+      "xConfidence": 0.88
+    },
+    {
+      "appName": "Microsoft Excel",
+      "description": "Analyzing financial data for a case.",
+      "timeA": 1501,
+      "timeB": 1545,
+      "xConfidence": 0.91
+    },
+    {
+      "appName": "Microsoft PowerPoint",
+      "description": "Preparing a presentation for a hearing.",
+      "timeA": 1545,
+      "timeB": 1632,
+      "xConfidence": 0.78
+    },
+    {
+      "appName": "Microsoft Outlook",
+      "description": "Checking the schedule and setting reminders.",
+      "timeA": 1632,
+      "timeB": 1641,
+      "xConfidence": 0.83
+    },
+    {
+      "appName": "Microsoft Teams",
+      "description": "Following an online training video.",
+      "timeA": 1641,
+      "timeB": 1707,
+      "xConfidence": 0.75
+    },
+    {
+      "appName": "Microsoft Outlook",
+      "description": "Closing the day.",
+      "timeA": 1707,
+      "timeB": 1715,
+      "xConfidence": 0.89
+    }
+  ]
+}

@@ -4,7 +4,7 @@
    --main-color: #1e1e29;
    --card-background: #ffffff;
    --outline-color: #d0d0e2;
-   --border-color: #5d5772;
+   --border-color: #7d60e7;
    --inner-card-background: #eeeeff;
 
    /* text */
@@ -22,6 +22,7 @@
 
    /* buttons */
    --button-height: 40px;
+   --button-padding: 16px;
    --button-background-hover: #eeeeff;
    --button-background-active: #ddddff;
 
@@ -29,6 +30,7 @@
    --card-radius: 32px;
    --card-padding: 16px 20px;
    --card-gap: 8px;
+   --inner-card-gap: 4px;
    --inner-card-radius: 16px;
    --inner-card-padding: 8px;
    --sidebar-width: 80px;
@@ -42,9 +44,6 @@
    --calendar-gap: 4px;
    --calendar-font-size: 0.85rem;
 
-   /* timetable */
-   --timetable-header-height: 64px;
-
    @media (prefers-reduced-motion: reduce) {
       --transition-opts: none;
    }
@@ -57,6 +56,11 @@
 
    @supports (font-variation-settings: normal) {
       font-family: InterVariable, sans-serif;
+   }
+
+   & ::selection {
+      background-color: var(--card-color-pastel);
+      color: var(--card-background);
    }
 }
 
@@ -85,6 +89,11 @@ button {
    font: inherit;
    color: inherit;
    cursor: pointer;
+
+   &:disabled {
+      pointer-events: none;
+      opacity: 0.5;
+   }
 }
 
 .card {
@@ -104,9 +113,9 @@ button {
 
       &#logoTitle {
          font-size: 1.8rem;
-         font-weight: var(--font-weight-bold);
+         font-weight: var(--font-weight-semibold);
          display: flex;
-         align-items: baseline;
+         align-items: center;
          gap: 4px;
          padding-inline: 8px;
       }
@@ -114,7 +123,7 @@ button {
 }
 
 .inner-card {
-   background-color: var(--inner-card-background);
+   background: var(--inner-card-background);
    color: var(--inner-card-color);
    border-radius: var(--inner-card-radius);
    padding: var(--inner-card-padding);
@@ -137,7 +146,7 @@ button {
       & button {
          display: flex;
          align-items: center;
-         padding-inline: 16px;
+         padding-inline: var(--button-padding);
          height: var(--button-height);
          gap: 8px;
          border-radius: calc(var(--button-height) / 2);
@@ -186,9 +195,16 @@ button {
          }
 
          & button {
-            width: var(--calendar-day-size);
+            height: var(--button-height);
+            width: var(--button-height);
+            border-radius: calc(var(--button-height) / 2);
             text-align: center;
             line-height: 1.8;
+            transition: background-color var(--transition-opts);
+
+            &:hover {
+               background-color: var(--button-background-active);
+            }
          }
       }
 
@@ -210,6 +226,26 @@ button {
             background-color: var(--card-background);
             padding: var(--calendar-gap);
             border-radius: calc(var(--inner-card-radius) - var(--inner-card-padding));
+            overflow: clip;
+
+            &.fade-right .week {
+               transform: translate(0);
+
+               @starting-style {
+                  transform: translateX(-500px);
+               }
+
+            }
+
+            &.fade-left .week {
+               transform: translateX(0);
+
+               @starting-style {
+                  transform: translateX(500px);
+               }
+
+            }
+
          }
 
          & span {
@@ -229,11 +265,12 @@ button {
             gap: calc(var(--calendar-gap) / 2);
             box-sizing: border-box;
             border: 2px solid transparent;
-            transition: background-color var(--transition-opts), border-color var(--transition-opts);
+            transition: background-color var(--transition-opts), border-color var(--transition-opts), transform .2s cubic-bezier(.08, .82, .17, 1);
          }
 
          & .day {
             cursor: pointer;
+            user-select: none;
             border: 2px solid transparent;
             border-radius: calc(var(--calendar-day-size) / 2 + 4px);
             transition: background-color var(--transition-opts), border-color var(--transition-opts);
@@ -257,6 +294,9 @@ button {
 
    & .timetable-container {
       flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: var(--card-gap);
 
       & .timetable-header {
          display: flex;
@@ -265,27 +305,123 @@ button {
          & .inner-card {
             width: fit-content;
             box-sizing: border-box;
-            height: var(--timetable-header-height);
+         }
 
-            &.reset {
-               width: var(--timetable-header-height);
-               border-radius: calc(var(--timetable-header-height) / 2);
+         & #reset {
+            border-radius: calc(var(--button-height) / 2);
+            height: var(--button-height);
+            max-width: var(--button-height);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color var(--transition-opts), max-width var(--transition-opts);
+            background-color: var(--button-background-hover);
+            overflow: clip;
+            justify-content: start;
+
+            & i {
+               min-width: var(--button-height);
+               text-align: center;
+            }
+
+            & span {
+               text-wrap: nowrap;
+               padding-inline-end: var(--button-padding);
+               opacity: 0;
+               transition: opacity var(--transition-opts);
+            }
+
+            &:hover {
+               background-color: var(--button-background-active);
+               max-width: 200px;
+
+               & span {
+                  opacity: 1;
+               }
+            }
+         }
+
+         & #options {
+            margin-inline-start: auto;
+
+            & label {
                display: flex;
+               flex-direction: column;
+               justify-content: end;
                align-items: center;
-               justify-content: center;
+               height: 100%;
+               background-color: var(--inner-card-background);
+               border-radius: var(--inner-card-radius);
+               padding: var(--inner-card-padding);
+               box-sizing: border-box;
+               color: var(--inner-card-color);
 
-               & button {
-                  height: var(--button-height);
-                  aspect-ratio: 1;
-                  display: flex;
-                  align-items: center;
-                  justify-content: center;
-                  border-radius: calc(var(--button-height) / 2);
-                  transition: background-color var(--transition-opts);
+               gap: var(--inner-card-gap);
 
-                  &:hover {
-                     background-color: var(--button-background-active);
-                  }
+               & span {
+                  font-size: 14px;
+                  font-weight: var(--font-weight-semibold);
+               }
+            }
+
+            & #confidence {
+               -webkit-appearance: none;
+               appearance: none;
+               background: transparent;
+               width: 120px;
+               margin: 2px 6px;
+
+               &::-webkit-slider-runnable-track,
+               &::-moz-range-track {
+                  background: var(--button-background-active);
+                  height: 4px;
+                  border-radius: 2px;
+               }
+
+               &::-webkit-slider-thumb,
+               &::-moz-range-thumb {
+                  -webkit-appearance: none;
+                  appearance: none;
+                  width: 12px;
+                  height: 12px;
+                  background: var(--border-color);
+                  border: none;
+                  border-radius: 6px;
+                  cursor: pointer;
+                  box-shadow: 0 1px 6px -2px black;
+               }
+            }
+         }
+      }
+
+      & .timetable-body {
+         display: flex;
+         flex-direction: column;
+         flex: 1;
+
+         & #timetable {
+            --inner-card-background:
+               linear-gradient(#fcfaff, #faf8ff) padding-box,
+               linear-gradient(#eeeeff, #eeeeee) border-box;
+            flex: 1;
+            display: flex;
+            gap: calc(var(--inner-card-gap));
+
+            & .day {
+               position: relative;
+               display: flex;
+               flex-direction: row;
+               gap: var(--inner-card-gap);
+               flex: 1;
+
+               & .inner-card {
+                  flex: 1;
+                  border: 1px solid transparent;
+                  box-shadow: 0 6px 20px -16px #000000aa;
+               }
+
+               &#templateDay {
+                  display: none;
                }
             }
          }
@@ -294,12 +430,12 @@ button {
 
    &[view="day"] {
 
-      & #timetableWeek,
-      #timetableMonth {
+      & #timetableWeekHeader,
+      #timetableMonthHeader {
          display: none;
       }
 
-      #timetableDay {
+      #timetableDayHeader {
          display: grid;
          text-transform: uppercase;
          font-size-adjust: ex-height .7;
@@ -364,12 +500,12 @@ button {
 
    &[view="week"] {
 
-      & #timetableDay,
-      #timetableMonth {
+      & #timetableDayHeader,
+      #timetableMonthHeader {
          display: none;
       }
 
-      #timetableWeek {
+      #timetableWeekHeader {
          display: grid;
          text-transform: uppercase;
          font-size-adjust: ex-height .7;
@@ -427,7 +563,22 @@ button {
          }
       }
 
+      #timetable {
+         & .logs-view {
+            position: absolute;
+            inset: 0;
+            background: transparent;
+            border: none;
+            pointer-events: none;
+
+            & div {
+               pointer-events: all;
+            }
+         }
+      }
+
       & .week {
+         cursor: pointer;
 
          &:hover {
             background-color: var(--button-background-hover);
@@ -448,8 +599,8 @@ button {
 
    &[view="month"] {
 
-      & #timetableDay,
-      #timetableWeek {
+      & #timetableDayHeader,
+      #timetableWeekHeader {
          display: none;
       }
    }

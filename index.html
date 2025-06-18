@@ -5,7 +5,7 @@
    <meta charset="UTF-8">
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
    <title>TimeReg</title>
-   <link rel="icon" href="./favicon.ico`" type="image/x-icon">
+   <link rel="icon" href="./favicon.ico" type="image/x-icon">
    <link rel="stylesheet" href="./fontawesome/fontawesome.css">
    <link rel="stylesheet" href="./styles.css">
    <link rel="preconnect" href="https://rsms.me/">
@@ -19,9 +19,9 @@
    <main>
       <div class="card">
          <section id="topbar">
-            <h1 id="logoTitle" class="title"><i class="far fa-clock"></i>TimeReg</h1>
+            <h1 id="logoTitle" class="title"><img src="./favicon.ico" style="height: 35px;" alt=""><span>TimeReg</span></h1>
             <ul id="timeframeSelector">
-               <li><button data-timeframe="month"><i class="fas fa-calendar-days"></i><span>Month</span></button></li>
+               <li><button data-timeframe="month" disabled=""><i class="fas fa-calendar-days"></i><span>Month</span></button></li>
                <li><button data-timeframe="week"><i class="fas fa-calendar-week"></i><span>Week</span></button></li>
                <li><button data-timeframe="day"><i class="fas fa-calendar-day"></i><span>Day</span></button></li>
             </ul>
@@ -54,28 +54,38 @@
 
             <div class="timetable-container">
                <div class="timetable-header">
-                  <div class="inner-card reset">
-                     <button id="reset"><i class="fas fa-refresh"></i></button>
-                  </div>
-                  <div id="timetableDay" class="inner-card">
+                  <div id="timetableDayHeader" class="inner-card">
                      <span class="month"></span>
                      <span class="date"></span>
                      <span class="day"></span>
                   </div>
-                  <div id="timetableWeek" class="inner-card">
+                  <div id="timetableWeekHeader" class="inner-card">
                      <span class="start-month"></span>
                      <span class="end-month"></span>
                      <span class="start-date"></span>
                      <span class="dash">-</span>
                      <span class="end-date"></span>
                   </div>
-                  <div id="timetableMonth" class="inner-card">
+                  <div id="timetableMonthHeader" class="inner-card">
                      <span class="moonth"></span>
                      <span class="year"></span>
                   </div>
+                  <button id="reset"><i class="fas fa-clock-rotate-left"></i><span>Reset to today</span></button>
+                  <div id="options">
+                     <label for="confidence">
+                        <span>Granularity</span>
+                        <input id="confidence" type="range" name="confidence" min="20" max="80" step="10">
+                     </label>
+
+                  </div>
                </div>
                <div class="timetable-body">
-                  <div id="timetable"></div>
+                  <div id="timetable">
+                     <div id="templateDay" class="day">
+                        <div class="logs-view inner-card"></div>
+                        <div class="suggestions-view inner-card"></div>
+                     </div>
+                  </div>
                </div>
             </div>
          </section>

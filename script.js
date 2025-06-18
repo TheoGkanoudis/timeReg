@@ -1,21 +1,24 @@
 import { getCookie, setCookie } from "./utils.js";
+import { setTimetable } from "./timetable.js";
+
 const transitionDuration =
    parseFloat($(":root").css("--transition-duration")) * 1000;
 
 const weekBeginsOnMonday = true;
-const workDayStart = 9;
-const workDayEnd = 17;
+
 var selectedDay = new Date();
+var confidenceLvl;
 var selectedWeekStart, selectedWeekEnd;
 
 $(function () {
    initView();
-   initCalendar();
-   initListeners();
+   setMonth(true);
+   listenersInit();
 });
 
 function initView() {
    const timeframe = getCookie("timeframe") || "day";
+   confidenceLvl = getCookie("confidence") || "0.5";
 
    $(content).attr("view", timeframe);
    $(timeframeSelector)
@@ -23,12 +26,7 @@ function initView() {
       .addClass("active");
 }
 
-function initCalendar() {
-   setMonth(true);
-   setTimetable();
-}
-
-function initListeners() {
+function listenersInit() {
    $(timeframeSelector).find("button").on("click", setTimeframe);
    $(calendar).on("click", changeDay);
    $(prevMonth).on("click", () =>
@@ -40,8 +38,8 @@ function initListeners() {
    $(reset).on("click", function () {
       selectedDay = new Date();
       setMonth(true, 0);
-      setTimetable();
    });
+   $(confidence).on("input", changeConfidence);
 }
 
 function setMonth(boot, distance = 0) {
@@ -149,47 +147,20 @@ function setMonth(boot, distance = 0) {
       setActiveWeek();
    }
 
+   //change animation
+   const prevDistace = parseInt($(calendar).attr("distance")) || 0;
+   const animationClass =
+      prevDistace < distance
+         ? "fade-left"
+         : prevDistace === distance
+         ? ""
+         : "fade-right";
+   $(calendar).addClass(animationClass);
+   setTimeout(() => {
+      $(calendar).removeClass(animationClass);
+   }, transitionDuration);
+
    $(calendar).attr("distance", distance);
-}
-
-function setTimetable() {
-   //day timetable
-   const dayName = selectedDay.toLocaleString("default", {
-      weekday: "short",
-   });
-   const dateNo = selectedDay.toLocaleDateString("default", {
-      day: "numeric",
-   });
-   const monthName = selectedDay.toLocaleString("default", {
-      month: "short",
-   });
-
-   $(timetableDay).find(".month").text(monthName);
-   $(timetableDay).find(".date").text(dateNo);
-   $(timetableDay).find(".day").text(dayName);
-   setDayTimetable();
-
-   //week timetable
-   const startMonthName = selectedWeekStart.toLocaleString("default", {
-      month: "short",
-   });
-   const startDateNo = selectedWeekStart.toLocaleDateString("default", {
-      day: "numeric",
-   });
-   const endMonthName = selectedWeekEnd.toLocaleString("default", {
-      month: "short",
-   });
-   const endDateNo = selectedWeekEnd.toLocaleDateString("default", {
-      day: "numeric",
-   });
-
-   $(timetableWeek).find(".start-month").text(startMonthName);
-   $(timetableWeek).find(".start-date").text(startDateNo);
-   $(timetableWeek)
-      .find(".end-month")
-      .text(startMonthName == endMonthName ? "" : endMonthName);
-   $(timetableWeek).find(".end-date").text(endDateNo);
-   setWeekTimetable();
 }
 
 function setTimeframe(e) {
@@ -199,13 +170,21 @@ function setTimeframe(e) {
    const timeframe = button.data("timeframe");
    $(content).attr("view", timeframe);
 
-   setCookie("timeframe", timeframe, 365);
+   setCookie("timeframe", timeframe, 30);
+   setTimetable(selectedDay, selectedWeekStart, selectedWeekEnd, confidenceLvl);
 }
 
 function changeDay(e) {
    let target = $(e.target);
    if (target.is("span")) {
       target = target.parent();
+   }
+   // if in week view, select first day of week
+   if ($('[view="week"]').length) {
+      if (!target.is(".week")) {
+         target = target.closest(".week");
+      }
+      target = target.find(".day").first();
    }
    if (!target.hasClass("day")) {
       return;
@@ -231,7 +210,6 @@ function changeDay(e) {
    $(calendar).find(".active").removeClass("active");
    target.addClass("active");
    setActiveWeek();
-   setTimetable();
 }
 
 function setActiveWeek() {
@@ -262,8 +240,11 @@ function setActiveWeek() {
    );
 
    selectedWeekEnd = new Date(lastOfWeek[2], lastOfWeek[1] - 1, lastOfWeek[0]);
+   setTimetable(selectedDay, selectedWeekStart, selectedWeekEnd, confidenceLvl);
 }
 
-function setDayTimetable() {}
-
-function setWeekTimetable() {}
+function changeConfidence(e) {
+   confidenceLvl = $(e.currentTarget).val() / 100;
+   setCookie("confidence", confidenceLvl, 30);
+   setTimetable(selectedDay, selectedWeekStart, selectedWeekEnd, confidenceLvl);
+}
