@@ -74,7 +74,7 @@
                   <div id="options">
                      <label for="confidence">
                         <span>Granularity</span>
-                        <input id="confidence" type="range" name="confidence" min="20" max="80" step="10">
+                        <input id="confidence" type="range" name="confidence" min="40" max="100" step="5">
                      </label>
 
                   </div>
@@ -82,8 +82,32 @@
                <div class="timetable-body">
                   <div id="timetable">
                      <div id="templateDay" class="day">
-                        <div class="logs-view inner-card"></div>
-                        <div class="suggestions-view inner-card"></div>
+                        <div class="logs-view inner-card">
+                           <h3 class="card-title long"></h3>
+                           <h3 class="card-title short"></h3>
+                           <div class="timesheet"></div>
+                        </div>
+                        <div class="suggestions-view inner-card">
+                           <h4 class="card-title">Suggested logs</h4>
+                           <div class="timesheet">
+                              <div id="templateSuggestion" class="suggestion">
+                                 <h4 class="suggestion-title">Title</h5>
+                                    <div class="suggestion-details">
+                                       <div class="suggestion-description">
+                                          <span class="description">Description of the suggestion</span>
+                                       </div>
+                                       <div class="suggestion-apps">
+                                          <div class="template app"><i class="fas fa-envelope"></i><span>App example</span></div>
+                                       </div>
+                                       <div class="suggestion-times">
+                                          <span class="time-start">00:00</span>
+                                          <span>-</span>
+                                          <span class="time-end">00:00</span>
+                                       </div>
+                                    </div>
+                              </div>
+                           </div>
+                        </div>
                      </div>
                   </div>
                </div>

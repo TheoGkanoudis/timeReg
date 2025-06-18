@@ -19,6 +19,7 @@ $(function () {
 function initView() {
    const timeframe = getCookie("timeframe") || "day";
    confidenceLvl = getCookie("confidence") || "0.5";
+   $(confidence).val(confidenceLvl * 100);
 
    $(content).attr("view", timeframe);
    $(timeframeSelector)

@@ -14,11 +14,13 @@
    --special-color: #7a6ff4;
    --disabled-color: #91919c;
    --error-color: #be7f7f;
-   --font-weight-thin: 300;
+   --font-weight-thin: 280;
+   --font-weight-light: 350;
    --font-weight-normal: 450;
-   --font-weight-semibold: 640;
-   --font-weight-bold: 760;
-   --font-weight-extrabold: 860;
+   --font-weight-medium: 520;
+   --font-weight-bold: 640;
+   --font-weight-heavy: 760;
+   --font-weight-black: 860;
 
    /* buttons */
    --button-height: 40px;
@@ -49,9 +51,13 @@
    }
 }
 
+* {
+   box-sizing: border-box;
+}
+
 :root {
    font-family: Inter, sans-serif;
-   font-feature-settings: 'liga' 1, 'calt' 1, "ss01" 1, "sso4" 1, "cs01" 1, "cv06" 1, "cv08" 1, "cv10" 1, "cv11" 1, "cv13" 1;
+   font-feature-settings: 'liga' 1, 'calt' 1, "ss01" 1, "sso4" 1, "cs01" 1, "cv05" 1, "cv06" 1, "cv08" 1, "cv10" 1, "cv11" 1, "cv13" 1;
    font-weight: var(--font-weight-normal);
 
    @supports (font-variation-settings: normal) {
@@ -107,13 +113,13 @@ button {
 
    & .title {
       font-size: 1.2rem;
-      font-weight: var(--font-weight-semibold);
+      font-weight: var(--font-weight-bold);
       letter-spacing: .02rem;
       margin: 0;
 
       &#logoTitle {
          font-size: 1.8rem;
-         font-weight: var(--font-weight-semibold);
+         font-weight: var(--font-weight-bold);
          display: flex;
          align-items: center;
          gap: 4px;
@@ -168,6 +174,7 @@ button {
    gap: var(--card-gap);
    flex: 1;
    padding-top: 12px;
+   max-height: calc(100vh - 96px);
 
    & .calendar-container {
       display: flex;
@@ -186,7 +193,7 @@ button {
             line-height: 1.5;
 
             & #currentMonth {
-               font-weight: var(--font-weight-bold);
+               font-weight: var(--font-weight-heavy);
             }
 
             & #currentYear {
@@ -214,7 +221,7 @@ button {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            font-weight: var(--font-weight-semibold);
+            font-weight: var(--font-weight-bold);
             margin-bottom: 8px;
             padding-inline: var(--calendar-gap);
          }
@@ -355,13 +362,8 @@ button {
                padding: var(--inner-card-padding);
                box-sizing: border-box;
                color: var(--inner-card-color);
-
+               font-weight: var(--font-weight-bold);
                gap: var(--inner-card-gap);
-
-               & span {
-                  font-size: 14px;
-                  font-weight: var(--font-weight-semibold);
-               }
             }
 
             & #confidence {
@@ -398,26 +400,129 @@ button {
          display: flex;
          flex-direction: column;
          flex: 1;
+         max-height: calc(100% - 74px);
 
          & #timetable {
             --inner-card-background:
                linear-gradient(#fcfaff, #faf8ff) padding-box,
                linear-gradient(#eeeeff, #eeeeee) border-box;
+            --inactive-suggestion-background:
+               linear-gradient(135deg, var(--button-background-hover), hsl(from var(--button-background-hover) calc(h - 45) s l)) padding-box,
+               linear-gradient(#e1e1e2, #e1e1f2) border-box;
             flex: 1;
             display: flex;
             gap: calc(var(--inner-card-gap));
+            max-height: 100%;
 
             & .day {
                position: relative;
                display: flex;
                flex-direction: row;
-               gap: var(--inner-card-gap);
+               gap: var(--card-gap);
                flex: 1;
 
                & .inner-card {
                   flex: 1;
                   border: 1px solid transparent;
                   box-shadow: 0 6px 20px -16px #000000aa;
+                  padding-inline: 0;
+                  padding-bottom: 0;
+                  gap: 0;
+                  max-height: 100%;
+                  overflow: clip;
+               }
+
+               & .card-title {
+                  margin-block: 0;
+                  padding: 4px 12px;
+               }
+
+               & .timesheet {
+                  display: flex;
+                  flex-direction: column;
+                  gap: var(--inner-card-gap);
+                  flex: 1;
+                  overflow: auto;
+                  padding: 8px;
+               }
+
+               & .logs-view {}
+
+               & .suggestions-view {
+                  display: flex;
+                  flex-direction: column;
+
+                  & .card-title {
+                     font-weight: var(--font-weight-light);
+                  }
+
+                  & .suggestion {
+                     background: var(--inactive-suggestion-background);
+                     border: 1px solid transparent;
+                     border-radius: var(--inner-card-radius);
+                     padding: 8px 12px;
+                     display: flex;
+                     flex-direction: column;
+                     gap: var(--inner-card-gap);
+                     box-shadow: 0 0 8px -6px #000000aa;
+                     transition: box-shadow var(--transition-opts), background-color var(--transition-opts);
+                     cursor: pointer;
+
+                     & .suggestion-title {
+                        margin-block: 0;
+                     }
+
+                     & .suggestion-details {
+                        display: flex;
+                        flex-direction: column;
+                        gap: var(--inner-card-gap);
+                        font-size: 0.9rem;
+
+                        & .suggestion-description {
+                           color: var(--card-color-pastel);
+                           font-weight: var(--font-weight-light);
+                           font-style: italic;
+                        }
+
+                        & .suggestion-apps {
+                           margin: 8px 4px;
+                           display: flex;
+                           flex-wrap: wrap;
+                           gap: 8px;
+                           font-size: 0.75rem;
+                           font-weight: var(--font-weight-medium);
+
+                           & .app {
+                              display: flex;
+                              gap: 4px;
+                              align-items: center;
+                              background-color: var(--card-background);
+                              padding-inline: 8px;
+                              height: 24px;
+                              border-radius: 12px;
+                              align-content: center;
+                              border: 1px solid #bbbbdd;
+                              box-shadow: 0 0 6px -3px #000000aa;
+
+                              &.template {
+                                 display: none;
+                              }
+                           }
+                        }
+
+                        & .suggestion-times {
+                           align-self: end;
+                        }
+                     }
+
+                     &:hover {
+                        box-shadow: none;
+                     }
+
+                     &#templateSuggestion {
+                        display: none;
+                     }
+                  }
                }
 
                &#templateDay {
@@ -433,6 +538,33 @@ button {
       & #timetableWeekHeader,
       #timetableMonthHeader {
          display: none;
+      }
+
+      & #calendar {
+         & .day {
+            &:hover span {
+               background-color: var(--button-background-hover);
+            }
+
+            &.active {
+               border-color: var(--border-color);
+               box-sizing: border-box;
+
+               & span {
+                  background-color: var(--button-background-active);
+               }
+
+               &.today {
+                  border-color: transparent;
+                  background-color: var(--border-color);
+               }
+            }
+
+            &.today span {
+               background-color: var(--card-color-pastel);
+               color: var(--inner-card-background);
+            }
+         }
       }
 
       #timetableDayHeader {
@@ -459,7 +591,7 @@ button {
             grid-column: 1;
             align-self: end;
             text-align: end;
-            font-weight: var(--font-weight-bold);
+            font-weight: var(--font-weight-heavy);
          }
 
          & .date {
@@ -467,33 +599,15 @@ button {
             grid-row: span 2;
             grid-column: 2;
             color: var(--special-color);
-            font-weight: var(--font-weight-extrabold);
+            font-weight: var(--font-weight-black);
          }
       }
 
-      & .day {
-
-         &:hover span {
-            background-color: var(--button-background-hover);
-         }
-
-         &.active {
-            border-color: var(--border-color);
-            box-sizing: border-box;
-
-            & span {
-               background-color: var(--button-background-active);
+      & #timetable {
+         & .logs-view {
+            & .card-title.short {
+               display: none;
             }
-
-            &.today {
-               border-color: transparent;
-               background-color: var(--border-color);
-            }
-         }
-
-         &.today span {
-            background-color: var(--card-color-pastel);
-            color: var(--inner-card-background);
          }
       }
    }
@@ -519,7 +633,7 @@ button {
             grid-column: 1;
             align-self: end;
             text-align: end;
-            font-weight: var(--font-weight-bold);
+            font-weight: var(--font-weight-heavy);
             padding-bottom: 4px;
          }
 
@@ -539,7 +653,7 @@ button {
             grid-row: span 2;
             grid-column: 2;
             color: var(--special-color);
-            font-weight: var(--font-weight-extrabold);
+            font-weight: var(--font-weight-black);
          }
 
          & .dash {
@@ -557,9 +671,30 @@ button {
             grid-row: span 2;
             grid-column: 4;
             align-self: end;
-            font-weight: var(--font-weight-semibold);
+            font-weight: var(--font-weight-bold);
             color: var(--card-color-pastel);
             line-height: 1.2;
+         }
+      }
+
+      & #calendar {
+         & .week {
+            cursor: pointer;
+
+            &:hover {
+               background-color: var(--button-background-hover);
+               border-color: var(--card-background)
+            }
+
+            &:has(.active) {
+               border-color: var(--border-color);
+               background-color: var(--button-background-active);
+            }
+
+            & .today span {
+               background-color: var(--card-color-pastel);
+               color: var(--inner-card-background);
+            }
          }
       }
 
@@ -574,25 +709,20 @@ button {
             & div {
                pointer-events: all;
             }
-         }
-      }
 
-      & .week {
-         cursor: pointer;
-
-         &:hover {
-            background-color: var(--button-background-hover);
-            border-color: var(--card-background)
+            & .card-title.long {
+               display: none
+            }
          }
 
-         &:has(.active) {
-            border-color: var(--border-color);
-            background-color: var(--button-background-active);
-         }
+         & .suggestions-view {
+            & .card-title {
+               display: none;
+            }
 
-         & .today span {
-            background-color: var(--card-color-pastel);
-            color: var(--inner-card-background);
+            & .timesheet {
+               padding-top: 40px !important;
+            }
          }
       }
    }
