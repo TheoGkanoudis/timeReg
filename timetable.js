@@ -19,11 +19,20 @@ class Day {
 class Suggestion {
    constructor() {
       this.interactions = [];
+      this.apps = [];
    }
    renderSuggestion(sheet) {
+      //create a suggestion element from the template
       const suggestionElm = $(templateSuggestion).clone().removeAttr("id");
-      //todo: make title dynamic
-      suggestionElm.find(".suggestion-title").text("Suggestion Title");
+      //title - todo: make this  dynamic
+      suggestionElm
+         .find(".suggestion-title")
+         .text(this.interactions[0].appName);
+      //description - todo: make this  dynamic
+      suggestionElm
+         .find(".suggestion-description")
+         .text(this.interactions[0].description);
+      //start and end time
       const timeStartString = this.interactions[0].timeA
          .toString()
          .padStart(4, "0")
@@ -35,16 +44,88 @@ class Suggestion {
          .padStart(4, "0")
          .replace(/(\d{2})(\d{2})/, "$1:$2");
 
-      suggestionElm.find(".time-start").text(timeStartString);
-      suggestionElm.find(".time-end").text(timeEndString);
+      suggestionElm
+         .find(".suggestion-details .time-start")
+         .text(timeStartString);
+      suggestionElm.find(".suggestion-details .time-end").text(timeEndString);
+
+      //interactions
       for (const i of this.interactions) {
+         const interactionContainer = suggestionElm.find(
+            ".suggestion-interactions"
+         );
+         const interactionElm = suggestionElm
+            .find(".interaction.template")
+            .clone()
+            .removeClass("template");
+         interactionElm.find(".app span").text(i.appName);
+         interactionElm.find(".description").text(i.description);
+         interactionElm.find(".time-start").text(
+            i.timeA
+               .toString()
+               .padStart(4, "0")
+               .replace(/(\d{2})(\d{2})/, "$1:$2")
+         );
+         interactionElm.find(".time-end").text(
+            i.timeB
+               .toString()
+               .padStart(4, "0")
+               .replace(/(\d{2})(\d{2})/, "$1:$2")
+         );
+         interactionContainer.append(interactionElm);
       }
-      console.log(suggestionElm);
+      //apps
+      for (const app of this.apps) {
+         const appsContainer = suggestionElm.find(".suggestion-apps");
+         const appsElm = suggestionElm
+            .find(".app.template")
+            .clone()
+            .removeClass("template");
+         appsElm.find("span").text(app);
+         appsContainer.append(appsElm);
+      }
+      //add the suggestion to the sheet
       sheet.append(suggestionElm);
+
+      //set details max height for animations
+      const detailsElm = suggestionElm.find(".suggestion-details");
+      detailsElm.css("max-height", detailsElm.height() + "px");
+
+      //set interactions max height for animations
+      let height = 0;
+      const interactionsElm = suggestionElm.find(".suggestion-interactions");
+      interactionsElm.find(".interaction").each(function () {
+         height += $(this).outerHeight();
+      });
+      interactionsElm.css("max-height", height + "px");
    }
 }
 
-$(function () {});
+$(function () {
+   listenersInit();
+});
+
+function listenersInit() {
+   $(timetable).on("click", timetableClick);
+
+   function timetableClick(e) {
+      const target = $(e.target);
+      //handle suggestions
+      let suggestion = target;
+      if (!suggestion.is(".suggestion")) {
+         suggestion = suggestion.closest(".suggestion");
+      }
+      if (suggestion.length) {
+         suggestionClick(suggestion);
+         return;
+      }
+   }
+
+   function suggestionClick(suggestion) {
+      $(".suggestion.expanded").not(suggestion).removeClass("expanded");
+      suggestion.toggleClass("expanded");
+   }
+}
 
 function setDayHeader() {
    const dayName = selectedDay.toLocaleString("default", {
@@ -115,6 +196,10 @@ function renderSuggestionsView(elm, dayData) {
          suggestion = new Suggestion();
       }
       suggestion.interactions.push(interaction);
+      const app = interaction.appName;
+      if (!suggestion.apps.includes(app)) {
+         suggestion.apps.push(app);
+      }
    }
    if (suggestion) {
       suggestion.renderSuggestion(timesheet);

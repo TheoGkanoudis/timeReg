@@ -1,19 +1,23 @@
 :root {
+   --hue-main: 250;
+   --hue-accent: 210;
+   --hue-error: 0;
    /* colors */
-   --main-background: #e9e9f3;
-   --main-color: #1e1e29;
-   --card-background: #ffffff;
-   --outline-color: #d0d0e2;
-   --border-color: #7d60e7;
-   --inner-card-background: #eeeeff;
+   --main-background: hsl(var(--hue-main), 60%, 97%);
+   --card-background: white;
+   --inner-card-background: hsl(var(--hue-main), 100%, 97%);
+   --outline-color: hsl(var(--hue-main), 40%, 80%);
+   --border-color: hsl(var(--hue-main), 70%, 65%);
 
-   /* text */
-   --card-color: #1b1b2d;
-   --card-color-pastel: #7171b9;
-   --inner-card-color: #1b1b2d;
-   --special-color: #7a6ff4;
-   --disabled-color: #91919c;
-   --error-color: #be7f7f;
+   /* text colors */
+   --main-color: hsl(var(--hue-main), 30%, 14%);
+   --card-color: hsl(var(--hue-main), 20%, 20%);
+   --inner-card-color: hsl(var(--hue-main), 20%, 14%);
+   --card-color-pastel: hsl(var(--hue-main), 40%, 66%);
+   --special-color: hsl(var(--hue-main), 80%, 70%);
+   --disabled-color: hsl(var(--hue-main), 20%, 70%);
+   --error-color: hsl(var(--hue-error), 90%, 65%);
+   /* font weights */
    --font-weight-thin: 280;
    --font-weight-light: 350;
    --font-weight-normal: 450;
@@ -25,8 +29,8 @@
    /* buttons */
    --button-height: 40px;
    --button-padding: 16px;
-   --button-background-hover: #eeeeff;
-   --button-background-active: #ddddff;
+   --button-background-hover: hsl(var(--hue-main), 100%, 96.5%);
+   --button-background-active: hsl(var(--hue-main), 100%, 92%);
 
    /* dimensions */
    --card-radius: 32px;
@@ -403,12 +407,15 @@ button {
          max-height: calc(100% - 74px);
 
          & #timetable {
+            --timetable-bg-1: hsl(var(--hue-main), 30%, 97%);
+            --timetable-bg-2: hsl(var(--hue-main), 30%, 98%);
+            --timetable-border-1: hsl(var(--hue-main), 100%, 95%);
+            --timetable-border-2: hsl(var(--hue-main), 100%, 97%);
+
             --inner-card-background:
-               linear-gradient(#fcfaff, #faf8ff) padding-box,
-               linear-gradient(#eeeeff, #eeeeee) border-box;
-            --inactive-suggestion-background:
-               linear-gradient(135deg, var(--button-background-hover), hsl(from var(--button-background-hover) calc(h - 45) s l)) padding-box,
-               linear-gradient(#e1e1e2, #e1e1f2) border-box;
+               linear-gradient(160deg, var(--timetable-bg-1), var(--timetable-bg-2)) padding-box,
+               linear-gradient(100deg, var(--timetable-border-1), var(--timetable-border-2)) border-box;
+
             flex: 1;
             display: flex;
             gap: calc(var(--inner-card-gap));
@@ -423,8 +430,8 @@ button {
 
                & .inner-card {
                   flex: 1;
+                  box-shadow: 0 2px 12px -8px #000000;
                   border: 1px solid transparent;
-                  box-shadow: 0 6px 20px -16px #000000aa;
                   padding-inline: 0;
                   padding-bottom: 0;
                   gap: 0;
@@ -440,10 +447,10 @@ button {
                & .timesheet {
                   display: flex;
                   flex-direction: column;
-                  gap: var(--inner-card-gap);
+                  gap: var(--card-gap);
                   flex: 1;
                   overflow: auto;
-                  padding: 8px;
+                  padding: 4px 10px;
                }
 
                & .logs-view {}
@@ -451,72 +458,168 @@ button {
                & .suggestions-view {
                   display: flex;
                   flex-direction: column;
+                  max-width: 520px;
+
 
                   & .card-title {
                      font-weight: var(--font-weight-light);
                   }
 
                   & .suggestion {
-                     background: var(--inactive-suggestion-background);
+                     --suggestion-bg-1: hsl(var(--hue-main), 90%, 96%);
+                     --suggestion-bg-2: hsl(var(--hue-accent), 90%, 96%);
+                     --suggestion-hover-bg-1: hsl(var(--hue-accent), 95%, 92%);
+                     --suggestion-hover-bg-2: hsl(var(--hue-main), 95%, 94%);
+                     --suggestion-border-1: hsl(var(--hue-main), 50%, 92%);
+                     --suggestion-border-2: hsl(var(--hue-main), 50%, 80%);
+                     --card-color-pastel: hsl(var(--hue-main), 30%, 45%);
+
+                     --suggestion-background:
+                        linear-gradient(120deg, var(--suggestion-bg-1), var(--suggestion-bg-2), var(--suggestion-hover-bg-1), var(--suggestion-hover-bg-2)) padding-box,
+                        linear-gradient(var(--suggestion-border-1), var(--suggestion-border-2)) border-box;
+
+                     background: var(--suggestion-background);
+                     background-size: 300% 100%;
                      border: 1px solid transparent;
                      border-radius: var(--inner-card-radius);
-                     padding: 8px 12px;
                      display: flex;
                      flex-direction: column;
                      gap: var(--inner-card-gap);
-                     box-shadow: 0 0 8px -6px #000000aa;
-                     transition: box-shadow var(--transition-opts), background-color var(--transition-opts);
+                     box-shadow: 0 1px 8px -6px black;
+                     transform-origin: top center;
+                     overflow: clip;
+                     transition:
+                        background .35s cubic-bezier(.42, .82, .37, .8),
+                        transform .2s cubic-bezier(.23, .45, .25, .9),
+                        box-shadow .2s cubic-bezier(.23, .45, .25, .9);
+
                      cursor: pointer;
 
                      & .suggestion-title {
+                        padding: 8px 12px 2px 12px;
                         margin-block: 0;
                      }
 
-                     & .suggestion-details {
+                     & .suggestion-description {
+                        padding: 0 12px 4px 12px;
+                        font-size: 0.9rem;
+                        color: var(--card-color-pastel);
+                        font-weight: var(--font-weight-light);
+                        font-style: italic;
+                     }
+
+                     & .suggestion-details,
+                     .suggestion-interactions {
+                        padding: 0 12px 8px 12px;
                         display: flex;
                         flex-direction: column;
                         gap: var(--inner-card-gap);
                         font-size: 0.9rem;
-
-                        & .suggestion-description {
-                           color: var(--card-color-pastel);
-                           font-weight: var(--font-weight-light);
-                           font-style: italic;
-                        }
+                        transition:
+                           max-height var(--transition-opts),
+                           opacity var(--transition-opts);
 
                         & .suggestion-apps {
                            margin: 8px 4px;
                            display: flex;
                            flex-wrap: wrap;
-                           gap: 8px;
+                           gap: 4px 8px;
+                           overflow: visible;
+                        }
+
+                        & .app {
+                           display: flex;
+                           gap: 4px;
+                           align-items: center;
+                           background-color: hsl(var(--hue-main), 60%, 97.5%);
+                           padding-inline: 8px;
+                           height: 24px;
+                           border-radius: 12px;
+                           align-content: center;
+                           border: 1px solid #bbbbdd;
+                           box-shadow: 0 0 6px -3px #000000aa;
                            font-size: 0.75rem;
                            font-weight: var(--font-weight-medium);
 
-                           & .app {
-                              display: flex;
-                              gap: 4px;
-                              align-items: center;
-                              background-color: var(--card-background);
-                              padding-inline: 8px;
-                              height: 24px;
-                              border-radius: 12px;
-                              align-content: center;
-                              border: 1px solid #bbbbdd;
-                              box-shadow: 0 0 6px -3px #000000aa;
-
-                              &.template {
-                                 display: none;
-                              }
+                           &.template {
+                              display: none;
                            }
                         }
 
-                        & .suggestion-times {
+                        & .times {
                            align-self: end;
                         }
                      }
 
+                     & .suggestion-interactions {
+                        padding-inline: 0;
+                        gap: 0;
+
+                        & .interaction {
+                           display: grid;
+                           grid-template-columns: auto 1fr;
+                           gap: 4px;
+                           position: relative;
+                           padding: 8px 12px;
+
+                           & .app {
+                              grid-row: 1 / span 2;
+                              grid-column: 1;
+                              align-self: center
+                           }
+
+                           & .description {
+                              grid-row: 1;
+                              grid-column: 2;
+                              font-weight: var(--font-weight-light);
+                              color: var(--card-color-pastel);
+                              font-size: .8rem;
+                              align-self: center;
+                              justify-self: end;
+                           }
+
+                           & .times {
+                              grid-row: 2;
+                              grid-column: 2;
+                              text-align: end;
+                           }
+
+                           &::before {
+                              position: absolute;
+                              top: 0;
+                              content: "";
+                              width: 100%;
+                              height: 1px;
+                              background-color: var(--outline-color);
+                              opacity: 0.5;
+                              margin-bottom: 4px;
+                           }
+
+                           &.template {
+                              display: none;
+                           }
+                        }
+                     }
+
+                     &.expanded {
+                        & .suggestion-details {
+                           max-height: 0 !important;
+                           opacity: 0 !important;
+                        }
+                     }
+
+                     &:not(.expanded) .suggestion-interactions {
+                        max-height: 0 !important;
+                        opacity: 0 !important;
+                     }
+
                      &:hover {
-                        box-shadow: none;
+                        background-position: 100% 0;
+                        box-shadow: 0 2px 12px -8px black;
+
+                        &:not(.expanded) {
+                           transform: scale(1.015);
+                        }
                      }
 
                      &#templateSuggestion {
