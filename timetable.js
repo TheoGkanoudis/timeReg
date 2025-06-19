@@ -1,5 +1,5 @@
-const workDayStart = 9;
-const workDayEnd = 17;
+const workDayStart = 8;
+const workDayEnd = 16;
 
 var selectedDay = new Date();
 var selectedWeekStart;
@@ -21,9 +21,11 @@ class Suggestion {
       this.interactions = [];
       this.apps = [];
    }
-   renderSuggestion(sheet) {
+   renderToSuggestions(sheet) {
       //create a suggestion element from the template
-      const suggestionElm = $(templateSuggestion).clone().removeAttr("id");
+      const suggestionElm = $(templateSuggestion)
+         .clone()
+         .attr("id", `suggestion-${this.id}`);
       //title - todo: make this  dynamic
       suggestionElm
          .find(".suggestion-title")
@@ -99,6 +101,45 @@ class Suggestion {
       });
       interactionsElm.css("max-height", height + "px");
    }
+   renderToLogs(sheet, quarterHeight) {
+      const suggestionElm = sheet
+         .find(".suggestion.template")
+         .clone()
+         .removeClass("template")
+         .attr("id", `preview-suggestion-${this.id}`);
+      //title - todo: make this dynamic
+      suggestionElm
+         .find(".suggestion-title")
+         .text(this.interactions[0].appName);
+      //times
+      const timeStartString = this.interactions[0].timeA
+         .toString()
+         .padStart(4, "0")
+         .replace(/(\d{2})(\d{2})/, "$1:$2");
+      const timeEndString = this.interactions[
+         this.interactions.length - 1
+      ].timeB
+         .toString()
+         .padStart(4, "0")
+         .replace(/(\d{2})(\d{2})/, "$1:$2");
+      suggestionElm.find(".time-start").text(timeStartString);
+      suggestionElm.find(".time-end").text(timeEndString);
+      //inject siggestion to sheet
+      sheet.append(suggestionElm);
+
+      //move to position
+      const startTime = this.interactions[0].timeA;
+      const startTimeInMins =
+         Math.floor(startTime / 100) * 60 + (startTime % 100);
+      const suggestionPosition = (startTimeInMins * quarterHeight) / 15;
+      suggestionElm.css("transform", `translateY(${suggestionPosition}px)`);
+      //set the height of the suggestion
+      const endTime = this.interactions[this.interactions.length - 1].timeB;
+      const endTimeInMins = Math.floor(endTime / 100) * 60 + (endTime % 100);
+      const suggestionHeight =
+         (endTimeInMins * quarterHeight) / 15 - suggestionPosition - 1;
+      suggestionElm.css("height", suggestionHeight + "px");
+   }
 }
 
 $(function () {
@@ -165,15 +206,15 @@ function setWeekHeader() {
    $(timetableWeekHeader).find(".end-date").text(endDateNo);
 }
 
-function renderLogsView(elm, dayData) {
-   elm.find(".logs-view .card-title.long").text(
+function renderLogsView(dayElm, dayData) {
+   dayElm.find(".logs-view .card-title.long").text(
       dayData.date.toLocaleDateString("default", {
          weekday: "long",
          month: "long",
          day: "numeric",
       })
    );
-   elm.find(".logs-view .card-title.short").text(
+   dayElm.find(".logs-view .card-title.short").text(
       dayData.date.toLocaleDateString("default", {
          weekday: "short",
          month: "short",
@@ -182,29 +223,81 @@ function renderLogsView(elm, dayData) {
    );
 }
 
-function renderSuggestionsView(elm, dayData) {
-   const timesheet = elm.find(".suggestions-view .timesheet");
-   timesheet.empty();
+function createSuggestions(dayElm, dayData) {
    const suggestions = [];
    var suggestion;
    for (const interaction of dayData.interactions) {
       if (interaction.xConfidence <= confidenceLvl) {
          if (suggestion) {
-            suggestion.renderSuggestion(timesheet);
             suggestions.push(suggestion);
          }
          suggestion = new Suggestion();
       }
       suggestion.interactions.push(interaction);
+      if (!suggestion.id) {
+         suggestion.id = interaction.id;
+      }
       const app = interaction.appName;
       if (!suggestion.apps.includes(app)) {
          suggestion.apps.push(app);
       }
    }
    if (suggestion) {
-      suggestion.renderSuggestion(timesheet);
       suggestions.push(suggestion);
    }
+
+   injectSuggestions(dayElm, suggestions);
+}
+
+function injectSuggestions(dayElm, suggestions) {
+   //prepare suggestions sheet
+   const suggestionsTimesheet = dayElm.find(".suggestions-view .timesheet");
+   suggestionsTimesheet.empty();
+
+   //prepare logs sheet
+   const logsTimesheet = dayElm.find(".logs-view .timesheet");
+   const quarterHeight = $(logsTimesheet).find(".quarter").outerHeight();
+   $(logsTimesheet).scrollTop(quarterHeight * (workDayStart * 4 - 1));
+
+   for (const suggestion of suggestions) {
+      suggestion.renderToSuggestions(suggestionsTimesheet);
+      suggestion.renderToLogs(logsTimesheet, quarterHeight);
+   }
+
+   injectHoverStyleSheet(suggestions);
+}
+
+function injectHoverStyleSheet(suggestions) {
+   //create a style sheet for hover effects
+   const cssContent = [];
+   for (const suggestion of suggestions) {
+      cssContent.push(
+         `body:has(#suggestion-${suggestion.id}:hover) #preview-suggestion-${suggestion.id}{
+            opacity: 1;
+            background-position: 100% 0 !important;
+            --suggestion-bg-border: var(--suggestion-border-focus);
+         }
+         
+         body:has(#preview-suggestion-${suggestion.id}:hover) #suggestion-${suggestion.id} {
+            background-position: 100% 0 !important;
+            box-shadow: 0 2px 12px -8px black !important;
+
+            &:not(.expanded) {
+               transform: scale(1.015);
+            }
+         }
+         `
+      );
+   }
+
+   //inject the style sheet into the head
+   const styleSheet = $("<style></style>");
+   styleSheet.text(cssContent.join("\n"));
+   if ($("style#suggestion-hover-styles").length) {
+      $("style#suggestion-hover-styles").remove();
+   }
+   styleSheet.attr("id", "suggestion-hover-styles");
+   $("head").append(styleSheet);
 }
 
 export function setTimetable(dSelected, wStart, wEnd, conf) {
@@ -255,7 +348,7 @@ export function setTimetable(dSelected, wStart, wEnd, conf) {
 
       //populate the day
       renderLogsView(dayElement, dayData);
-      renderSuggestionsView(dayElement, dayData);
+      createSuggestions(dayElement, dayData);
    }
 
    async function fetchDayData(day) {

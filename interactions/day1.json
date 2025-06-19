@@ -1,6 +1,7 @@
 {
   "workDay": [
     {
+      "id": "1",
       "appName": "Microsoft Outlook",
       "description": "Reviewing emails and scheduling meetings.",
       "timeA": 800,
@@ -8,6 +9,7 @@
       "xConfidence": 0
     },
     {
+      "id": "2",
       "appName": "Microsoft Word",
       "description": "Drafting a legal memo on contract law.",
       "timeA": 825,
@@ -15,6 +17,7 @@
       "xConfidence": 0.85
     },
     {
+      "id": "3",
       "appName": "LexisNexis",
       "description": "Conducting legal research on case precedents.",
       "timeA": 912,
@@ -22,6 +25,7 @@
       "xConfidence": 0.9
     },
     {
+      "id": "4",
       "appName": "Microsoft Outlook",
       "description": "Responding to client emails and checking calendar.",
       "timeA": 947,
@@ -29,6 +33,7 @@
       "xConfidence": 0.78
     },
     {
+      "id": "5",
       "appName": "Microsoft Teams",
       "description": "Participating in a virtual meeting with a client.",
       "timeA": 959,
@@ -36,6 +41,7 @@
       "xConfidence": 0.95
     },
     {
+      "id": "6",
       "appName": "Microsoft Word",
       "description": "Revising the contract draft based on research.",
       "timeA": 1041,
@@ -43,6 +49,7 @@
       "xConfidence": 0.92
     },
     {
+      "id": "7",
       "appName": "Adobe Acrobat",
       "description": "Reviewing a PDF document.",
       "timeA": 1128,
@@ -50,6 +57,7 @@
       "xConfidence": 0.75
     },
     {
+      "id": "8",
       "appName": "Microsoft Outlook",
       "description": "Scheduling a follow up meeting with the client.",
       "timeA": 1142,
@@ -57,6 +65,7 @@
       "xConfidence": 0.8
     },
     {
+      "id": "9",
       "appName": "LexisNexis",
       "description": "Checking the latest updates of case precedents.",
       "timeA": 1148,
@@ -64,6 +73,7 @@
       "xConfidence": 0.6
     },
     {
+      "id": "10",
       "appName": "Microsoft Word",
       "description": "Editing a new document.",
       "timeA": 1205,
@@ -71,6 +81,7 @@
       "xConfidence": 0.9
     },
     {
+      "id": "11",
       "appName": "Microsoft Teams",
       "description": "Attending a quick internal meeting.",
       "timeA": 1243,
@@ -78,13 +89,15 @@
       "xConfidence": 0.97
     },
     {
+      "id": "12",
       "appName": "Microsoft Outlook",
       "description": "Preparing the lunch break reminder.",
       "timeA": 1244,
       "timeB": 1300,
       "xConfidence": 0.65
     },
-    {
+    { 
+      "id": "13",
       "appName": "Microsoft Outlook",
       "description": "Checking and responding to urgent emails.",
       "timeA": 1300,
@@ -92,6 +105,7 @@
       "xConfidence": 0.92
     },
     {
+      "id": "14",
       "appName": "Microsoft Word",
       "description": "Drafting a settlement agreement.",
       "timeA": 1310,
@@ -99,6 +113,7 @@
       "xConfidence": 0.95
     },
     {
+      "id": "15",
       "appName": "LexisNexis",
       "description": "Reviewing legal articles.",
       "timeA": 1422,
@@ -106,13 +121,15 @@
       "xConfidence": 0.88
     },
     {
+      "id": "16",
       "appName": "Microsoft Excel",
       "description": "Analyzing financial data for a case.",
       "timeA": 1501,
       "timeB": 1545,
       "xConfidence": 0.91
-    },
+    }, 
     {
+      "id": "17",
       "appName": "Microsoft PowerPoint",
       "description": "Preparing a presentation for a hearing.",
       "timeA": 1545,
@@ -120,6 +137,7 @@
       "xConfidence": 0.78
     },
     {
+      "id": "18",
       "appName": "Microsoft Outlook",
       "description": "Checking the schedule and setting reminders.",
       "timeA": 1632,
@@ -127,6 +145,7 @@
       "xConfidence": 0.83
     },
     {
+      "id": "19",
       "appName": "Microsoft Teams",
       "description": "Following an online training video.",
       "timeA": 1641,
@@ -134,6 +153,7 @@
       "xConfidence": 0.75
     },
     {
+      "id": "20",
       "appName": "Microsoft Outlook",
       "description": "Closing the day.",
       "timeA": 1707,

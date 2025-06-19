@@ -50,6 +50,10 @@
    --calendar-gap: 4px;
    --calendar-font-size: 0.85rem;
 
+   /* editable */
+   --zoom-level: 1;
+   --font-size: 15px;
+
    @media (prefers-reduced-motion: reduce) {
       --transition-opts: none;
    }
@@ -63,6 +67,10 @@
    font-family: Inter, sans-serif;
    font-feature-settings: 'liga' 1, 'calt' 1, "ss01" 1, "sso4" 1, "cs01" 1, "cv05" 1, "cv06" 1, "cv08" 1, "cv10" 1, "cv11" 1, "cv13" 1;
    font-weight: var(--font-weight-normal);
+   height: 100%;
+
+   zoom: var(--zoom-level);
+   font-size: var(--font-size);
 
    @supports (font-variation-settings: normal) {
       font-family: InterVariable, sans-serif;
@@ -81,10 +89,11 @@ body {
    color: var(--main-color);
    overflow: clip;
    margin: 0;
+   height: 100%;
 }
 
 #sidebar {
-   height: 100vh;
+   height: 100%;
    width: var(--sidebar-width);
 }
 
@@ -115,6 +124,7 @@ button {
    display: flex;
    flex-direction: column;
    flex: 1;
+   max-height: 100%;
 
    & .title {
       font-size: 1.2rem;
@@ -179,7 +189,7 @@ button {
    gap: var(--card-gap);
    flex: 1;
    padding-top: 12px;
-   max-height: calc(100vh - 96px);
+   max-height: calc(100% - 50px);
 
    & .calendar-container {
       display: flex;
@@ -439,6 +449,25 @@ button {
             max-height: 100%;
 
             & .day {
+               --card-color-pastel: hsl(var(--hue-main), 30%, 45%);
+
+               --suggestion-bg-1: hsl(var(--hue-main), 90%, 97%);
+               --suggestion-bg-2: hsl(var(--hue-accent), 90%, 96%);
+               --suggestion-hover-bg-1: hsl(var(--hue-accent), 95%, 92%);
+               --suggestion-hover-bg-2: hsl(var(--hue-main), 95%, 94%);
+               --suggestion-border-1: hsl(var(--hue-main), 50%, 92%);
+               --suggestion-border-2: hsl(var(--hue-main), 50%, 80%);
+               --suggestion-border-focus: hsl(var(--hue-main), 40%, 50%);
+               --suggestion-bg-content:
+                  linear-gradient(120deg, var(--suggestion-bg-2), var(--suggestion-bg-1), var(--suggestion-hover-bg-1), var(--suggestion-hover-bg-2));
+               --suggestion-bg-glass:
+                  linear-gradient(120deg, hsl(from var(--suggestion-bg-1) h s l /.5), hsl(from var(--suggestion-bg-2) h s l /.5), hsl(from var(--suggestion-hover-bg-1) h s l /.5), hsl(from var(--suggestion-hover-bg-2) h s l /.5));
+               --suggestion-bg-border: linear-gradient(var(--suggestion-border-1), var(--suggestion-border-2));
+
+               --suggestion-background:
+                  var(--suggestion-bg-content) padding-box,
+                  var(--suggestion-bg-border) border-box;
+
                position: relative;
                display: flex;
                flex-direction: row;
@@ -468,9 +497,121 @@ button {
                   flex: 1;
                   overflow: auto;
                   padding: 4px 10px;
+                  height: 100%;
                }
 
-               & .logs-view {}
+               & .logs-view {
+
+                  & .timesheet {
+                     height: 100%;
+                     overflow: auto;
+                     display: grid;
+                     grid-template-rows: repeat(96, 20px);
+                     counter-reset: hour minute;
+                     padding-block: 12px 32px;
+                     gap: 0;
+                     position: relative;
+
+
+                     & .quarter {
+                        counter-increment: minute 15;
+                        --border-opacity: 0.15;
+                        --leading-zero: '';
+                        margin-inline: 40px 20px;
+                        position: relative;
+
+                        &:nth-child(4n + 1) {
+                           &:not(:first-child) {
+                              counter-increment: hour;
+                              --leading-zero: '0';
+                           }
+
+                           counter-reset: minute;
+                           --border-opacity: 0.4;
+
+                           &::before {
+                              content: counter(hour) ":00";
+                              position: absolute;
+                              left: -40px;
+                              top: -1px;
+                              transform: translateY(-50%);
+                              font-size: 0.8rem;
+                              color: var(--card-color-pastel);
+                           }
+                        }
+
+                        &:hover {
+                           --border-opacity: 0.7;
+                           --special-color: var(--card-color);
+                        }
+
+                        box-sizing: content-box;
+                        border-top: 1px solid hsl(from var(--special-color) h s l / var(--border-opacity));
+                     }
+
+                     & .suggestion {
+                        display: flex;
+                        flex-direction: column;
+                        position: absolute;
+                        top: 12px;
+                        left: 100px;
+                        right: 40px;
+                        bottom: auto;
+                        border-radius: calc(var(--inner-card-radius) / 2);
+                        padding-inline: var(--inner-card-padding);
+                        z-index: 1;
+                        background: var(--suggestion-bg-glass);
+                        background-size: 300% 100%;
+                        transition:
+                           background .35s cubic-bezier(.42, .82, .37, .8),
+                           opacity .2s cubic-bezier(.23, .45, .25, .9), ;
+                        backdrop-filter: blur(3px);
+                        box-shadow: 0 1px 8px -6px black;
+                        opacity: 0.95;
+                        color: hsl(from var(--card-color-pastel) h s calc(l * 1.4));
+                        overflow: clip;
+                        justify-content: space-between;
+
+                        & .suggestion-title {
+                           padding-top: var(--inner-card-padding);
+                           font-weight: var(--font-weight-medium);
+                           font-size: 0.92rem;
+                        }
+
+                        & .times {
+                           font-size: 0.85rem;
+                           text-align: end;
+                           font-weight: var(--font-weight-light);
+                           font-style: italic;
+                           padding-bottom: var(--inner-card-padding);
+                        }
+
+                        &::after {
+                           position: absolute;
+                           content: "";
+                           inset: 0;
+                           background: var(--suggestion-bg-border) border-box;
+                           z-index: -1;
+                           border-radius: inherit;
+                           border: 1px solid transparent;
+                           mask:
+                              linear-gradient(black) border-box,
+                              linear-gradient(black) padding-box;
+                           mask-composite: subtract;
+                        }
+
+                        &:hover {
+                           opacity: 1;
+                           background-position: 100% 0 !important;
+                           --suggestion-bg-border: var(--suggestion-border-focus);
+                        }
+
+                        &.template {
+                           display: none;
+                        }
+                     }
+                  }
+               }
 
                & .suggestions-view {
                   display: flex;
@@ -483,18 +624,6 @@ button {
                   }
 
                   & .suggestion {
-                     --suggestion-bg-1: hsl(var(--hue-main), 90%, 96%);
-                     --suggestion-bg-2: hsl(var(--hue-accent), 90%, 96%);
-                     --suggestion-hover-bg-1: hsl(var(--hue-accent), 95%, 92%);
-                     --suggestion-hover-bg-2: hsl(var(--hue-main), 95%, 94%);
-                     --suggestion-border-1: hsl(var(--hue-main), 50%, 92%);
-                     --suggestion-border-2: hsl(var(--hue-main), 50%, 80%);
-                     --card-color-pastel: hsl(var(--hue-main), 30%, 45%);
-
-                     --suggestion-background:
-                        linear-gradient(120deg, var(--suggestion-bg-1), var(--suggestion-bg-2), var(--suggestion-hover-bg-1), var(--suggestion-hover-bg-2)) padding-box,
-                        linear-gradient(var(--suggestion-border-1), var(--suggestion-border-2)) border-box;
-
                      background: var(--suggestion-background);
                      background-size: 300% 100%;
                      border: 1px solid transparent;
@@ -745,7 +874,7 @@ button {
          font-size-adjust: ex-height .7;
          line-height: 1;
          padding: 12px 16px;
-         border-radius: 100vh;
+         border-radius: 1000px;
 
          & .start-month {
             font-size: 1rem;
