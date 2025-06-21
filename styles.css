@@ -42,7 +42,7 @@
    --sidebar-width: 80px;
 
    /* transition */
-   --transition-duration: 0.2s;
+   --transition-duration: 0.25s;
    --transition-opts: var(--transition-duration) ease;
 
    /* calendar */
@@ -450,6 +450,9 @@ button {
 
             & .day {
                --card-color-pastel: hsl(var(--hue-main), 30%, 45%);
+               --card-color-pastel-semi-light: hsl(from var(--card-color-pastel) h s calc(l * 1.2));
+               --card-color-pastel-light: hsl(from var(--card-color-pastel) h s calc(l * 1.4));
+               --card-color-pastel-extra-light: hsl(from var(--card-color-pastel) h s calc(l * 1.6));
 
                --suggestion-bg-1: hsl(var(--hue-main), 90%, 97%);
                --suggestion-bg-2: hsl(var(--hue-accent), 90%, 96%);
@@ -458,6 +461,7 @@ button {
                --suggestion-border-1: hsl(var(--hue-main), 50%, 92%);
                --suggestion-border-2: hsl(var(--hue-main), 50%, 80%);
                --suggestion-border-focus: hsl(var(--hue-main), 40%, 50%);
+               --suggestion-shadow: 0 1px 8px -6px black;
                --suggestion-bg-content:
                   linear-gradient(120deg, var(--suggestion-bg-2), var(--suggestion-bg-1), var(--suggestion-hover-bg-1), var(--suggestion-hover-bg-2));
                --suggestion-bg-glass:
@@ -467,6 +471,18 @@ button {
                --suggestion-background:
                   var(--suggestion-bg-content) padding-box,
                   var(--suggestion-bg-border) border-box;
+
+               --suggestion-border-1-active: var(--card-color-pastel-extra-light);
+               --suggestion-border-2-active: var(--card-color-pastel-semi-light);
+               --suggestion-bg-content-active:
+                  linear-gradient(120deg, var(--suggestion-hover-bg-1), var(--suggestion-hover-bg-2));
+               --suggestion-bg-border-active: linear-gradient(var(--suggestion-border-1-active), var(--suggestion-border-2-active));
+
+               --suggestion-background-active:
+                  var(--suggestion-bg-content-active) padding-box,
+                  var(--suggestion-bg-border-active) border-box;
+               --break-height: 16px;
+
 
                position: relative;
                display: flex;
@@ -566,11 +582,12 @@ button {
                            background .35s cubic-bezier(.42, .82, .37, .8),
                            opacity .2s cubic-bezier(.23, .45, .25, .9), ;
                         backdrop-filter: blur(3px);
-                        box-shadow: 0 1px 8px -6px black;
+                        box-shadow: var(--suggestion-shadow);
                         opacity: 0.95;
-                        color: hsl(from var(--card-color-pastel) h s calc(l * 1.4));
+                        color: var(--card-color-pastel-light);
                         overflow: clip;
                         justify-content: space-between;
+                        cursor: pointer;
 
                         & .suggestion-title {
                            padding-top: var(--inner-card-padding);
@@ -603,7 +620,7 @@ button {
                         &:hover {
                            opacity: 1;
                            background-position: 100% 0 !important;
-                           --suggestion-bg-border: var(--suggestion-border-focus);
+                           --suggestion-bg-border: var(--suggestion-bg-border-active);
                         }
 
                         &.template {
@@ -630,33 +647,43 @@ button {
                      border-radius: var(--inner-card-radius);
                      display: flex;
                      flex-direction: column;
-                     gap: var(--inner-card-gap);
-                     box-shadow: 0 1px 8px -6px black;
+                     box-shadow: var(--suggestion-shadow);
                      transform-origin: top center;
                      overflow: clip;
                      transition:
                         background .35s cubic-bezier(.42, .82, .37, .8),
                         transform .2s cubic-bezier(.23, .45, .25, .9),
-                        box-shadow .2s cubic-bezier(.23, .45, .25, .9);
+                        box-shadow .2s cubic-bezier(.23, .45, .25, .9),
+                        margin var(--transition-opts);
 
                      cursor: pointer;
 
                      & .suggestion-title {
+                        overflow: clip;
                         padding: 8px 12px 2px 12px;
                         margin-block: 0;
+                        max-height: 30px;
+                        transition:
+                           max-height var(--transition-opts),
+                           padding var(--transition-opts);
                      }
 
                      & .suggestion-description {
-                        padding: 0 12px 4px 12px;
+                        padding: 2px 12px 8px 12px;
                         font-size: 0.9rem;
                         color: var(--card-color-pastel);
                         font-weight: var(--font-weight-light);
                         font-style: italic;
+                        overflow: clip;
+                        max-height: 50px;
+                        transition:
+                           max-height var(--transition-opts),
+                           padding var(--transition-opts);
                      }
 
                      & .suggestion-details,
                      .suggestion-interactions {
-                        padding: 0 12px 8px 12px;
+                        padding: 0 12px;
                         display: flex;
                         flex-direction: column;
                         gap: var(--inner-card-gap);
@@ -666,7 +693,7 @@ button {
                            opacity var(--transition-opts);
 
                         & .suggestion-apps {
-                           margin: 8px 4px;
+                           padding: 8px 4px;
                            display: flex;
                            flex-wrap: wrap;
                            gap: 4px 8px;
@@ -694,29 +721,36 @@ button {
 
                         & .times {
                            align-self: end;
+                           padding-bottom: 8px;
                         }
                      }
 
                      & .suggestion-interactions {
                         padding-inline: 0;
                         gap: 0;
+                        overflow: auto;
+                        border-top: 1px solid var(--outline-color);
 
                         & .interaction {
-                           display: grid;
-                           grid-template-columns: auto 1fr;
+                           display: flex;
                            gap: 4px;
                            position: relative;
-                           padding: 8px 12px;
+                           padding: 8px 12px 20px 12px;
+                           border-top: 1px solid var(--outline-color);
+                           margin-bottom: 0;
+                           width: 100%;
+                           transition:
+                              margin var(--transition-opts);
+                           z-index: 1;
+                           background: var(--suggestion-background);
+                           pointer-events: none;
 
                            & .app {
-                              grid-row: 1 / span 2;
-                              grid-column: 1;
                               align-self: center
                            }
 
                            & .description {
-                              grid-row: 1;
-                              grid-column: 2;
+                              flex: 1;
                               font-weight: var(--font-weight-light);
                               color: var(--card-color-pastel);
                               font-size: .8rem;
@@ -725,32 +759,96 @@ button {
                            }
 
                            & .times {
-                              grid-row: 2;
-                              grid-column: 2;
-                              text-align: end;
-                           }
-
-                           &::before {
                               position: absolute;
-                              top: 0;
-                              content: "";
-                              width: 100%;
-                              height: 1px;
-                              background-color: var(--outline-color);
-                              opacity: 0.5;
-                              margin-bottom: 4px;
+                              inset: auto 0 0 auto;
+                              font-size: .85rem;
+                              padding: 4px 8px;
                            }
 
                            &.template {
                               display: none;
                            }
+
+                           &:not(:last-child) {
+                              &:hover {
+                                 margin-bottom: calc(var(--break-height) + 2px);
+
+                                 &+.interaction {
+                                    border-width: 0;
+                                 }
+
+                                 &:after {
+                                    max-height: var(--break-height);
+                                 }
+                              }
+
+                              &:before {
+                                 content: "";
+                                 position: absolute;
+                                 inset: 50% 0 -50% 0;
+                                 pointer-events: all;
+                              }
+
+                              &:after {
+                                 font-family: 'Font Awesome 6 Free';
+                                 font-weight: 900;
+                                 font-size: 10px;
+                                 content: "\f07d";
+                                 top: 100%;
+                                 left: 0;
+                                 display: flex;
+                                 align-items: center;
+                                 justify-content: center;
+                                 position: absolute;
+                                 width: 100%;
+                                 height: var(--break-height);
+                                 max-height: 0;
+                                 background: var(--inner-card-background);
+                                 border-block: 1px solid var(--outline-color);
+                                 z-index: -100;
+                                 color: var(--card-color-pastel);
+                                 transition: max-height var(--transition-opts);
+                                 overflow: clip;
+                                 box-shadow: var(--suggestion-shadow) inset;
+                              }
+                           }
+
+                           &:last-child {
+                              padding-bottom: 24px;
+
+                              & .times {
+                                 padding-bottom: 8px;
+                              }
+                           }
                         }
                      }
 
                      &.expanded {
+                        --suggestion-background: var(--suggestion-background-active);
+                        border-width: 2px;
+
                         & .suggestion-details {
                            max-height: 0 !important;
                            opacity: 0 !important;
+                        }
+                     }
+
+                     &.new {
+                        margin-bottom: calc(var(--card-gap) * -1 - 2px);
+                        transform: translateY(calc(var(--card-gap) * -1 - 2px));
+
+                        & .suggestion-title,
+                        .suggestion-description {
+                           padding-block: 0;
+                           max-height: 0;
+                        }
+
+                        & .suggestion-interactions {
+                           border-top: none;
+
+                           & .interaction:first-child {
+                              border-top: none;
+                           }
                         }
                      }
 
@@ -761,9 +859,9 @@ button {
 
                      &:hover {
                         background-position: 100% 0;
-                        box-shadow: 0 2px 12px -8px black;
 
                         &:not(.expanded) {
+                           box-shadow: 0 2px 12px -8px black;
                            transform: scale(1.015);
                         }
                      }

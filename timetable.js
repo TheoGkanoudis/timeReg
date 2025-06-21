@@ -1,10 +1,13 @@
 const workDayStart = 8;
 const workDayEnd = 16;
+const suggestionBlockMargin = 60;
 
 var selectedDay = new Date();
 var selectedWeekStart;
 var selectedWeekEnd;
 var confidenceLvl;
+var suggestions = [];
+var quarterHeight;
 
 const loadedDays = new Map();
 var currentDay;
@@ -21,11 +24,19 @@ class Suggestion {
       this.interactions = [];
       this.apps = [];
    }
-   renderToSuggestions(sheet) {
+   renderToSuggestions(
+      sheet,
+      totalSuggestions,
+      inPosition = null,
+      replace = false,
+      newSuggestion = false
+   ) {
       //create a suggestion element from the template
       const suggestionElm = $(templateSuggestion)
          .clone()
-         .attr("id", `suggestion-${this.id}`);
+         .attr("id", `suggestion-${this.id}`)
+         .attr("data-id", this.id)
+         .addClass(replace ? "expanded" : newSuggestion ? "new expanded" : "");
       //title - todo: make this  dynamic
       suggestionElm
          .find(".suggestion-title")
@@ -59,7 +70,8 @@ class Suggestion {
          const interactionElm = suggestionElm
             .find(".interaction.template")
             .clone()
-            .removeClass("template");
+            .removeClass("template")
+            .attr("data-id", i.id);
          interactionElm.find(".app span").text(i.appName);
          interactionElm.find(".description").text(i.description);
          interactionElm.find(".time-start").text(
@@ -87,26 +99,69 @@ class Suggestion {
          appsContainer.append(appsElm);
       }
       //add the suggestion to the sheet
-      sheet.append(suggestionElm);
-
+      if (inPosition != null) {
+         const positionedElm = sheet
+            .find(".suggestion:not(.template)")
+            .eq(inPosition);
+         if (replace) positionedElm.replaceWith(suggestionElm);
+         else positionedElm.after(suggestionElm);
+      } else {
+         sheet.append(suggestionElm);
+      }
       //set details max height for animations
+      let detailsHeight;
       const detailsElm = suggestionElm.find(".suggestion-details");
-      detailsElm.css("max-height", detailsElm.height() + "px");
+      if (replace || newSuggestion) {
+         const appsElm = suggestionElm.find(".suggestion-apps");
+         const timesElm = suggestionElm.find(".suggestion-details .times");
+         detailsHeight = appsElm.outerHeight() + timesElm.outerHeight() + 4;
+      } else {
+         detailsHeight = detailsElm.outerHeight();
+      }
+      detailsElm.css("max-height", detailsHeight + "px");
 
       //set interactions max height for animations
-      let height = 0;
+      let interactionsHeight = 0;
       const interactionsElm = suggestionElm.find(".suggestion-interactions");
-      interactionsElm.find(".interaction").each(function () {
-         height += $(this).outerHeight();
+      interactionsElm.find(".interaction:not(.template)").each(function () {
+         interactionsHeight += $(this).outerHeight();
       });
-      interactionsElm.css("max-height", height + "px");
+      //define margins for max height
+      const suggestionIndex = suggestions.findIndex((s) => s.id == this.id);
+      const blockMargins =
+         suggestionIndex > 0 && suggestionIndex < totalSuggestions - 1 ? 2 : 1;
+      suggestionBlockMargin *
+         (totalSuggestions <= 3 ? totalSuggestions - 1 : 2);
+      //set heights for collapsed and expanded states - introduce delay to ensure animations are finished
+      setTimeout(() => {
+         const headerHeight =
+            suggestionElm.find(".suggestion-description").outerHeight() +
+            suggestionElm.find(".suggestion-title").outerHeight();
+         let availableHeight = sheet.height() - headerHeight - 8;
+         const maxHeight =
+            availableHeight - blockMargins * suggestionBlockMargin;
+         interactionsHeight =
+            interactionsHeight > maxHeight ? maxHeight : interactionsHeight;
+         interactionsElm.css(
+            "max-height",
+            `calc(${interactionsHeight}px + var(--break-height) + 2px)`
+         );
+         const collapsedHeight = headerHeight + detailsHeight;
+         const expandedHeight = headerHeight + interactionsHeight;
+         suggestionElm.data("collapsedHeight", collapsedHeight);
+         suggestionElm.data("expandedHeight", expandedHeight);
+      }, 250);
+      if (newSuggestion) {
+         suggestionElm.removeClass("new expanded");
+      }
    }
    renderToLogs(sheet, quarterHeight) {
       const suggestionElm = sheet
          .find(".suggestion.template")
          .clone()
          .removeClass("template")
-         .attr("id", `preview-suggestion-${this.id}`);
+         .attr("id", `preview-suggestion-${this.id}`)
+         .attr("data-id", this.id);
       //title - todo: make this dynamic
       suggestionElm
          .find(".suggestion-title")
@@ -132,13 +187,66 @@ class Suggestion {
       const startTimeInMins =
          Math.floor(startTime / 100) * 60 + (startTime % 100);
       const suggestionPosition = (startTimeInMins * quarterHeight) / 15;
-      suggestionElm.css("transform", `translateY(${suggestionPosition}px)`);
+      suggestionElm
+         .css("transform", `translateY(${suggestionPosition}px)`)
+         .attr("position", suggestionPosition);
       //set the height of the suggestion
       const endTime = this.interactions[this.interactions.length - 1].timeB;
       const endTimeInMins = Math.floor(endTime / 100) * 60 + (endTime % 100);
       const suggestionHeight =
          (endTimeInMins * quarterHeight) / 15 - suggestionPosition - 1;
       suggestionElm.css("height", suggestionHeight + "px");
+   }
+   splitAt(interactionElm) {
+      //trim interactions from current suggestion and redefine apps
+      const interactionId = interactionElm.attr("data-id");
+      const suggestionId = this.id;
+      const logsSheet = interactionElm
+         .closest(".day")
+         .find(".logs-view .timesheet");
+      let found = false;
+      const trimmedInteractions = [];
+      this.apps = [];
+      for (let i = this.interactions.length - 1; i >= 0; i--) {
+         const interaction = this.interactions[i];
+         if (interaction.id == interactionId) {
+            found = true;
+         }
+         if (found) {
+            const app = interaction.appName;
+            if (!this.apps.includes(app)) {
+               this.apps.push(app);
+            }
+            continue;
+         }
+         trimmedInteractions.push(interaction);
+         this.interactions.pop();
+      }
+      this.apps.reverse();
+      trimmedInteractions.reverse();
+      //create new suggestion according to trimmed suggestions
+      const newSuggestion = new Suggestion();
+      for (const interaction of trimmedInteractions) {
+         newSuggestion.interactions.push(interaction);
+         if (!newSuggestion.id) {
+            newSuggestion.id = interaction.id;
+         }
+         const app = interaction.appName;
+         if (!newSuggestion.apps.includes(app)) {
+            newSuggestion.apps.push(app);
+         }
+      }
+      const position = suggestions.findIndex(
+         (s) => s.id == $(interactionElm).closest(".suggestion").attr("data-id")
+      );
+      const sheet = interactionElm.closest(".timesheet");
+      const elmCount = sheet.find(".suggestion:not(.template)").length + 1;
+      this.renderToSuggestions(sheet, elmCount, position, true);
+      suggestions.splice(position + 1, 0, newSuggestion);
+      newSuggestion.renderToSuggestions(sheet, elmCount, position, false, true);
+      logsSheet.find(`#preview-suggestion-${suggestionId}`).remove();
+      this.renderToLogs(logsSheet, quarterHeight);
+      newSuggestion.renderToLogs(logsSheet, quarterHeight);
    }
 }
 
@@ -151,6 +259,21 @@ function listenersInit() {
 
    function timetableClick(e) {
       const target = $(e.target);
+      //handle interactions
+      let interaction = target;
+      if (!interaction.is(".interaction")) {
+         interaction = interaction.closest(".interaction");
+      }
+      if (interaction.length) {
+         const suggestion = suggestions.find((s) => {
+            const suggestionId = interaction
+               .closest(".suggestion")
+               .attr("data-id");
+            return s.id == suggestionId;
+         });
+         suggestion.splitAt(interaction);
+         return;
+      }
       //handle suggestions
       let suggestion = target;
       if (!suggestion.is(".suggestion")) {
@@ -163,8 +286,49 @@ function listenersInit() {
    }
 
    function suggestionClick(suggestion) {
+      //make shadow suggestion click original
+      if (suggestion.closest(".logs-view").length) {
+         const id = suggestion.attr("data-id");
+         suggestion = $(`.suggestions-view .suggestion[data-id="${id}"`);
+      }
+      //expand clicked suggestion
       $(".suggestion.expanded").not(suggestion).removeClass("expanded");
       suggestion.toggleClass("expanded");
+      const shadow = $(
+         suggestion
+            .closest(".day")
+            .find(`#preview-suggestion-${suggestion.attr("data-id")}`)
+      );
+      //scroll suggestion to position;
+      const suggestionsContainer = $(suggestion).parent();
+      const suggestions = suggestionsContainer.children();
+      let pxToScroll =
+         (suggestionsContainer.outerHeight() -
+            suggestion.data("expandedHeight")) /
+         -2;
+      for (const s of suggestions) {
+         if ($(s).is(suggestion)) {
+            break;
+         }
+         pxToScroll += $(s).data("collapsedHeight") + 8;
+      }
+      suggestion.parent().animate(
+         {
+            scrollTop: pxToScroll,
+         },
+         250
+      );
+      //scroll shadow to position
+      const timesheet = shadow.closest(".timesheet");
+      pxToScroll = parseInt(shadow.attr("position"));
+      const margin = (timesheet.height() - shadow.outerHeight()) / 2;
+      pxToScroll -= margin > 0 ? margin : 0;
+      timesheet.animate(
+         {
+            scrollTop: pxToScroll,
+         },
+         200
+      );
    }
 }
 
@@ -224,7 +388,7 @@ function renderLogsView(dayElm, dayData) {
 }
 
 function createSuggestions(dayElm, dayData) {
-   const suggestions = [];
+   suggestions = [];
    var suggestion;
    for (const interaction of dayData.interactions) {
       if (interaction.xConfidence <= confidenceLvl) {
@@ -256,11 +420,11 @@ function injectSuggestions(dayElm, suggestions) {
 
    //prepare logs sheet
    const logsTimesheet = dayElm.find(".logs-view .timesheet");
-   const quarterHeight = $(logsTimesheet).find(".quarter").outerHeight();
+   quarterHeight = $(logsTimesheet).find(".quarter").outerHeight();
    $(logsTimesheet).scrollTop(quarterHeight * (workDayStart * 4 - 1));
 
    for (const suggestion of suggestions) {
-      suggestion.renderToSuggestions(suggestionsTimesheet);
+      suggestion.renderToSuggestions(suggestionsTimesheet, suggestions.length);
       suggestion.renderToLogs(logsTimesheet, quarterHeight);
    }
 
@@ -272,7 +436,7 @@ function injectHoverStyleSheet(suggestions) {
    const cssContent = [];
    for (const suggestion of suggestions) {
       cssContent.push(
-         `body:has(#suggestion-${suggestion.id}:hover) #preview-suggestion-${suggestion.id}{
+         `body:has(#suggestion-${suggestion.id}:is(:hover, .expanded)) #preview-suggestion-${suggestion.id}{
             opacity: 1;
             background-position: 100% 0 !important;
             --suggestion-bg-border: var(--suggestion-border-focus);
