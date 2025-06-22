@@ -40,11 +40,15 @@ class Suggestion {
       //title - todo: make this  dynamic
       suggestionElm
          .find(".suggestion-title")
-         .text(this.interactions[0].appName);
+         .text(newSuggestion ? "New Suggestion" : this.interactions[0].appName);
       //description - todo: make this  dynamic
       suggestionElm
          .find(".suggestion-description")
-         .text(this.interactions[0].description);
+         .text(
+            newSuggestion
+               ? "Insert description"
+               : this.interactions[0].description
+         );
       //start and end time
       const timeStartString = this.interactions[0].timeA
          .toString()
@@ -134,6 +138,11 @@ class Suggestion {
          (totalSuggestions <= 3 ? totalSuggestions - 1 : 2);
       //set heights for collapsed and expanded states - introduce delay to ensure animations are finished
       setTimeout(() => {
+         if (newSuggestion) {
+            suggestionElm.removeClass("new expanded");
+         }
+      }, 150);
+      setTimeout(() => {
          const headerHeight =
             suggestionElm.find(".suggestion-description").outerHeight() +
             suggestionElm.find(".suggestion-title").outerHeight();
@@ -146,14 +155,11 @@ class Suggestion {
             "max-height",
             `calc(${interactionsHeight}px + var(--break-height) + 2px)`
          );
-         const collapsedHeight = headerHeight + detailsHeight;
-         const expandedHeight = headerHeight + interactionsHeight;
+         const collapsedHeight = headerHeight + detailsHeight + 2;
+         const expandedHeight = headerHeight + interactionsHeight + 2;
          suggestionElm.data("collapsedHeight", collapsedHeight);
          suggestionElm.data("expandedHeight", expandedHeight);
-      }, 250);
-      if (newSuggestion) {
-         suggestionElm.removeClass("new expanded");
-      }
+      }, 400);
    }
    renderToLogs(sheet, quarterHeight) {
       const suggestionElm = sheet
@@ -247,6 +253,37 @@ class Suggestion {
       logsSheet.find(`#preview-suggestion-${suggestionId}`).remove();
       this.renderToLogs(logsSheet, quarterHeight);
       newSuggestion.renderToLogs(logsSheet, quarterHeight);
+      injectHoverStyleSheet();
+   }
+   mergeWith(suggestionElm) {
+      const suggestion = suggestions.find(
+         (s) => s.id == suggestionElm.attr("data-id")
+      );
+      //merge interactions and apps
+      for (const interaction of suggestion.interactions) {
+         this.interactions.push(interaction);
+         const app = interaction.appName;
+         if (!this.apps.includes(app)) {
+            this.apps.push(app);
+         }
+      }
+      //remove suggestion from the list
+      const position = suggestions.findIndex((s) => s.id == this.id);
+      suggestions.splice(position, 2, this);
+
+      //remove suggestion from the sheet
+      const sheet = $(suggestionElm).closest(".timesheet");
+      $(suggestionElm).remove();
+      //re-render the suggestion
+      const elmCount = sheet.find(".suggestion:not(.template)").length;
+      this.renderToSuggestions(sheet, elmCount, position, true);
+      //remove suggestion from the logs
+      const logsSheet = $(sheet).closest(".day").find(".logs-view .timesheet");
+      logsSheet.find(`#preview-suggestion-${suggestion.id}`).remove();
+      logsSheet.find(`#preview-suggestion-${this.id}`).remove();
+      //re-render this log
+      this.renderToLogs(logsSheet, quarterHeight);
+      injectHoverStyleSheet();
    }
 }
 
@@ -255,10 +292,65 @@ $(function () {
 });
 
 function listenersInit() {
-   $(timetable).on("click", timetableClick);
+   $(timetable)
+      .on("click", timetableClick)
+      .on("dragstart", ".suggestion", function (e) {
+         $(e.currentTarget).addClass("dragged");
+      })
+      .on("dragend", ".suggestion", function (e) {
+         $(e.currentTarget).removeClass("dragged");
+      })
+      .on("dragover", ".suggestion:not(.dragged)", function (e) {
+         e.preventDefault();
+      })
+      .on("dragenter", ".suggestion:not(.dragged)", function (e) {
+         $(e.currentTarget).addClass("dragover");
+         e.preventDefault();
+      })
+      .on("dragleave", ".suggestion:not(.dragged)", function (e) {
+         if ($(e.relatedTarget).closest(".suggestion:not(.dragged)").length) {
+            return;
+         }
+         $(e.currentTarget).removeClass("dragover");
+      })
+      .on("drop", ".suggestion:not(.dragged)", function (e) {
+         const dragged = $(".suggestion.dragged");
+         const dropped = $(e.currentTarget);
+         e.currentTarget.classList.remove("dragover");
+         if (dragged.next().is(dropped)) {
+            const draggedSuggestion = suggestions.find(
+               (s) => s.id == dragged.attr("data-id")
+            );
+            draggedSuggestion.mergeWith(dropped);
+            return;
+         }
+         if (dropped.next().is(dragged)) {
+            const droppedSuggestion = suggestions.find(
+               (s) => s.id == dropped.attr("data-id")
+            );
+            droppedSuggestion.mergeWith(dragged);
+            return;
+         }
+      });
 
    function timetableClick(e) {
       const target = $(e.target);
+      // suggestion actions
+      let button = target;
+      if (!button.is("button")) {
+         button = button.closest("button");
+      }
+      if (button.length) {
+         if (button.is(".accept")) {
+            const suggestionId = button.closest(".suggestion").attr("data-id");
+            const day = button.closest(".day");
+            day.find(`#suggestion-${suggestionId}`).toggleClass("accepted");
+            day.find(`#preview-suggestion-${suggestionId}`)
+               .toggleClass("suggestion")
+               .toggleClass("log");
+         }
+         return;
+      }
       //handle interactions
       let interaction = target;
       if (!interaction.is(".interaction")) {
@@ -266,10 +358,7 @@ function listenersInit() {
       }
       if (interaction.length) {
          const suggestion = suggestions.find((s) => {
-            const suggestionId = interaction
-               .closest(".suggestion")
-               .attr("data-id");
-            return s.id == suggestionId;
+            return s.id == interaction.closest(".suggestion").attr("data-id");
          });
          suggestion.splitAt(interaction);
          return;
@@ -428,21 +517,21 @@ function injectSuggestions(dayElm, suggestions) {
       suggestion.renderToLogs(logsTimesheet, quarterHeight);
    }
 
-   injectHoverStyleSheet(suggestions);
+   injectHoverStyleSheet();
 }
 
-function injectHoverStyleSheet(suggestions) {
+function injectHoverStyleSheet() {
    //create a style sheet for hover effects
    const cssContent = [];
    for (const suggestion of suggestions) {
       cssContent.push(
-         `body:has(#suggestion-${suggestion.id}:is(:hover, .expanded)) #preview-suggestion-${suggestion.id}{
+         `body:has(#suggestion-${suggestion.id}:is(:hover, .expanded)) #preview-suggestion-${suggestion.id}:not(.log){
             opacity: 1;
             background-position: 100% 0 !important;
             --suggestion-bg-border: var(--suggestion-border-focus);
          }
          
-         body:has(#preview-suggestion-${suggestion.id}:hover) #suggestion-${suggestion.id} {
+         body:has(#preview-suggestion-${suggestion.id}:hover) #suggestion-${suggestion.id}:not(.accepted) {
             background-position: 100% 0 !important;
             box-shadow: 0 2px 12px -8px black !important;
 

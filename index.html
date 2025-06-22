@@ -184,6 +184,10 @@
                               <div class="quarter"></div>
                               <div class="suggestion template">
                                  <div class="suggestion-title">Suggestion</div>
+                                 <div class="suggestion-actions">
+                                    <button class="accept"><i class="fas fa-check"></i></button>
+                                    <button class="delete"><i class="fas fa-x"></i></button>
+                                 </div>
                                  <div class="times">
                                     <span class="time-start">00:00</span>
                                     <span>-</span>
@@ -194,32 +198,36 @@
                         </div>
                         <div class="suggestions-view inner-card">
                            <div class="timesheet">
-                              <div id="templateSuggestion" class="suggestion">
-                                 <h4 class="suggestion-title">Title</h5>
-                                    <div class="suggestion-description">
-                                       <span class="description">Description of the suggestion</span>
+                              <div id="templateSuggestion" class="suggestion" draggable="true">
+                                 <h4 class="suggestion-title">Title</h4>
+                                 <div class="suggestion-actions">
+                                    <button class="accept"><i class="fas fa-check"></i></button>
+                                    <button class="delete"><i class="fas fa-x"></i></button>
+                                 </div>
+                                 <div class="suggestion-description">
+                                    <span class="description">Description of the suggestion</span>
+                                 </div>
+                                 <div class="suggestion-details">
+                                    <div class="suggestion-apps">
+                                       <div class="app template"><i class="fas fa-envelope"></i><span>App example</span></div>
                                     </div>
-                                    <div class="suggestion-details">
-                                       <div class="suggestion-apps">
-                                          <div class="app template"><i class="fas fa-envelope"></i><span>App example</span></div>
-                                       </div>
+                                    <div class="times">
+                                       <span class="time-start">00:00</span>
+                                       <span>-</span>
+                                       <span class="time-end">00:00</span>
+                                    </div>
+                                 </div>
+                                 <div class="suggestion-interactions">
+                                    <div class="interaction template">
+                                       <div class="app"><i class="fas fa-envelope"></i><span>Interaction app</span></div>
+                                       <div class="description">Expamle description of an interaction</div>
                                        <div class="times">
                                           <span class="time-start">00:00</span>
                                           <span>-</span>
                                           <span class="time-end">00:00</span>
                                        </div>
                                     </div>
-                                    <div class="suggestion-interactions">
-                                       <div class="interaction template">
-                                          <div class="app"><i class="fas fa-envelope"></i><span>Interaction app</span></div>
-                                          <div class="description">Expamle description of an interaction</div>
-                                          <div class="times">
-                                             <span class="time-start">00:00</span>
-                                             <span>-</span>
-                                             <span class="time-end">00:00</span>
-                                          </div>
-                                       </div>
-                                    </div>
+                                 </div>
                               </div>
                            </div>
                         </div>

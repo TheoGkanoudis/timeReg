@@ -462,15 +462,36 @@ button {
                --suggestion-border-2: hsl(var(--hue-main), 50%, 80%);
                --suggestion-border-focus: hsl(var(--hue-main), 40%, 50%);
                --suggestion-shadow: 0 1px 8px -6px black;
-               --suggestion-bg-content:
-                  linear-gradient(120deg, var(--suggestion-bg-2), var(--suggestion-bg-1), var(--suggestion-hover-bg-1), var(--suggestion-hover-bg-2));
+
+               --log-bg-1: hsl(var(--hue-main), 40%, 35%);
+               --log-bg-2: hsl(var(--hue-main), 30%, 30%);
+               --log-border-1: hsl(var(--hue-main), 70%, 75%);
+               --log-border-2: hsl(var(--hue-main), 80%, 30%);
+               --log-shadow: 0 0 3px 1px #000000aa;
+
                --suggestion-bg-glass:
                   linear-gradient(120deg, hsl(from var(--suggestion-bg-1) h s l /.5), hsl(from var(--suggestion-bg-2) h s l /.5), hsl(from var(--suggestion-hover-bg-1) h s l /.5), hsl(from var(--suggestion-hover-bg-2) h s l /.5));
-               --suggestion-bg-border: linear-gradient(var(--suggestion-border-1), var(--suggestion-border-2));
+
+               --suggestion-bg-content:
+                  linear-gradient(120deg, var(--suggestion-bg-2), var(--suggestion-bg-1), var(--suggestion-hover-bg-1), var(--suggestion-hover-bg-2));
+               --suggestion-bg-border:
+                  linear-gradient(var(--suggestion-border-1), var(--suggestion-border-2));
 
                --suggestion-background:
                   var(--suggestion-bg-content) padding-box,
                   var(--suggestion-bg-border) border-box;
+
+               --log-bg-content:
+                  linear-gradient(120deg, var(--log-bg-1), var(--log-bg-2));
+               --log-bg-border:
+                  linear-gradient(var(--log-border-1), var(--log-border-2));
+
+               --log-background:
+                  var(--log-bg-content) padding-box,
+                  var(--log-bg-border) border-box;
+
+               --log-background-app:
+                  linear-gradient(120deg, hsl(var(--hue-main), 25%, 32%), hsl(var(--hue-main), 30%, 30%));
 
                --suggestion-border-1-active: var(--card-color-pastel-extra-light);
                --suggestion-border-2-active: var(--card-color-pastel-semi-light);
@@ -481,8 +502,8 @@ button {
                --suggestion-background-active:
                   var(--suggestion-bg-content-active) padding-box,
                   var(--suggestion-bg-border-active) border-box;
-               --break-height: 16px;
 
+               --break-height: 16px;
 
                position: relative;
                display: flex;
@@ -565,7 +586,8 @@ button {
                         border-top: 1px solid hsl(from var(--special-color) h s l / var(--border-opacity));
                      }
 
-                     & .suggestion {
+                     & .suggestion,
+                     .log {
                         display: flex;
                         flex-direction: column;
                         position: absolute;
@@ -576,18 +598,48 @@ button {
                         border-radius: calc(var(--inner-card-radius) / 2);
                         padding-inline: var(--inner-card-padding);
                         z-index: 1;
-                        background: var(--suggestion-bg-glass);
-                        background-size: 300% 100%;
                         transition:
                            background .35s cubic-bezier(.42, .82, .37, .8),
-                           opacity .2s cubic-bezier(.23, .45, .25, .9), ;
-                        backdrop-filter: blur(3px);
-                        box-shadow: var(--suggestion-shadow);
-                        opacity: 0.95;
-                        color: var(--card-color-pastel-light);
+                           opacity .2s cubic-bezier(.23, .45, .25, .9);
                         overflow: clip;
                         justify-content: space-between;
                         cursor: pointer;
+
+                        &.suggestion {
+                           opacity: 0.95;
+                           background: var(--suggestion-bg-glass);
+                           background-size: 300% 100%;
+                           color: var(--card-color-pastel-light);
+                           backdrop-filter: blur(3px);
+                           box-shadow: var(--suggestion-shadow);
+
+                           &:hover {
+                              opacity: 1;
+                              background-position: 100% 0 !important;
+                              --suggestion-bg-border: var(--suggestion-bg-`border-active);
+                           }
+
+                           &::after {
+                              position: absolute;
+                              content: "";
+                              inset: 0;
+                              background: var(--suggestion-bg-border) border-box;
+                              z-index: -1;
+                              border-radius: inherit;
+                              border: 1px solid transparent;
+                              mask:
+                                 linear-gradient(black) border-box,
+                                 linear-gradient(black) padding-box;
+                              mask-composite: subtract;
+                           }
+                        }
+
+                        &.log {
+                           border: 1px solid transparent;
+                           background: var(--log-background);
+                           color: var(--card-color-pastel-extra-light);
+                           box-shadow: var(--log-shadow);
+                        }
 
                         & .suggestion-title {
                            padding-top: var(--inner-card-padding);
@@ -601,26 +653,6 @@ button {
                            font-weight: var(--font-weight-light);
                            font-style: italic;
                            padding-bottom: var(--inner-card-padding);
-                        }
-
-                        &::after {
-                           position: absolute;
-                           content: "";
-                           inset: 0;
-                           background: var(--suggestion-bg-border) border-box;
-                           z-index: -1;
-                           border-radius: inherit;
-                           border: 1px solid transparent;
-                           mask:
-                              linear-gradient(black) border-box,
-                              linear-gradient(black) padding-box;
-                           mask-composite: subtract;
-                        }
-
-                        &:hover {
-                           opacity: 1;
-                           background-position: 100% 0 !important;
-                           --suggestion-bg-border: var(--suggestion-bg-border-active);
                         }
 
                         &.template {
@@ -650,19 +682,22 @@ button {
                      box-shadow: var(--suggestion-shadow);
                      transform-origin: top center;
                      overflow: clip;
+                     cursor: pointer;
+                     user-select: none;
+                     position: relative;
                      transition:
                         background .35s cubic-bezier(.42, .82, .37, .8),
                         transform .2s cubic-bezier(.23, .45, .25, .9),
                         box-shadow .2s cubic-bezier(.23, .45, .25, .9),
                         margin var(--transition-opts);
 
-                     cursor: pointer;
 
                      & .suggestion-title {
                         overflow: clip;
                         padding: 8px 12px 2px 12px;
                         margin-block: 0;
                         max-height: 30px;
+                        padding-inline-end: 40px;
                         transition:
                            max-height var(--transition-opts),
                            padding var(--transition-opts);
@@ -768,57 +803,59 @@ button {
                            &.template {
                               display: none;
                            }
+                        }
+                     }
 
-                           &:not(:last-child) {
-                              &:hover {
-                                 margin-bottom: calc(var(--break-height) + 2px);
+                     &:not(.accepted) .interaction {
+                        &:not(:last-child) {
+                           &:hover {
+                              margin-bottom: calc(var(--break-height) + 2px);
 
-                                 &+.interaction {
-                                    border-width: 0;
-                                 }
-
-                                 &:after {
-                                    max-height: var(--break-height);
-                                 }
-                              }
-
-                              &:before {
-                                 content: "";
-                                 position: absolute;
-                                 inset: 50% 0 -50% 0;
-                                 pointer-events: all;
+                              &+.interaction {
+                                 border-width: 0;
                               }
 
                               &:after {
-                                 font-family: 'Font Awesome 6 Free';
-                                 font-weight: 900;
-                                 font-size: 10px;
-                                 content: "\f07d";
-                                 top: 100%;
-                                 left: 0;
-                                 display: flex;
-                                 align-items: center;
-                                 justify-content: center;
-                                 position: absolute;
-                                 width: 100%;
-                                 height: var(--break-height);
-                                 max-height: 0;
-                                 background: var(--inner-card-background);
-                                 border-block: 1px solid var(--outline-color);
-                                 z-index: -100;
-                                 color: var(--card-color-pastel);
-                                 transition: max-height var(--transition-opts);
-                                 overflow: clip;
-                                 box-shadow: var(--suggestion-shadow) inset;
+                                 max-height: var(--break-height);
                               }
                            }
 
-                           &:last-child {
-                              padding-bottom: 24px;
+                           &:before {
+                              content: "";
+                              position: absolute;
+                              inset: 50% 0 -50% 0;
+                              pointer-events: all;
+                           }
 
-                              & .times {
-                                 padding-bottom: 8px;
-                              }
+                           &:after {
+                              font-family: 'Font Awesome 6 Free';
+                              font-weight: 900;
+                              font-size: 10px;
+                              content: "\f07d";
+                              top: 100%;
+                              left: 0;
+                              display: flex;
+                              align-items: center;
+                              justify-content: center;
+                              position: absolute;
+                              width: 100%;
+                              height: var(--break-height);
+                              max-height: 0;
+                              background: var(--inner-card-background);
+                              border-block: 1px solid var(--outline-color);
+                              z-index: -100;
+                              color: var(--card-color-pastel);
+                              transition: max-height var(--transition-opts);
+                              overflow: clip;
+                              box-shadow: var(--suggestion-shadow) inset;
+                           }
+                        }
+
+                        &:last-child {
+                           padding-bottom: 24px;
+
+                           & .times {
+                              padding-bottom: 8px;
                            }
                         }
                      }
@@ -833,9 +870,52 @@ button {
                         }
                      }
 
+                     &.dragged,
+                     &.dragover {
+
+                        &:has(+ .dragged, + .dragover) {
+                           transform: scale(1.015);
+                           --suggestion-background: var(--suggestion-background-active);
+                           background-position: 100% 0;
+                           border-radius: var(--inner-card-radius) var(--inner-card-radius) 0 0;
+                           overflow: visible !important;
+                           z-index: 1;
+
+                           & * {
+                              opacity: .3;
+                           }
+
+                           &:after {
+                              content: "Release to merge items";
+                              position: absolute;
+                              top: 100%;
+                              left: 0;
+                              transform: translateY(-60%);
+                              background: var(--suggestion-background-active);
+                              background-position: 100% 0;
+                              background-size: 300% 100%;
+                              width: calc(100% - 2px);
+                              text-align: center;
+                           }
+
+                           &+.dragged,
+                           +.dragover {
+                              transform: scale(1.015);
+                              --suggestion-background: var(--suggestion-background-active);
+                              background-position: 100% 0;
+                              border-radius: 0 0 var(--inner-card-radius) var(--inner-card-radius);
+                              margin-top: calc(var(--card-gap) * -1 - 2px);
+
+
+                              & * {
+                                 opacity: .3;
+                              }
+                           }
+                        }
+                     }
+
                      &.new {
-                        margin-bottom: calc(var(--card-gap) * -1 - 2px);
-                        transform: translateY(calc(var(--card-gap) * -1 - 2px));
+                        margin-top: calc(var(--card-gap) * -1 - 2px);
 
                         & .suggestion-title,
                         .suggestion-description {
@@ -869,11 +949,84 @@ button {
                      &#templateSuggestion {
                         display: none;
                      }
+
+                     &.accepted {
+                        background: var(--log-background);
+                        color: var(--card-color-pastel-extra-light);
+                        box-shadow: var(--log-shadow);
+                        --outline-color: var(--card-color-pastel);
+
+                        & .suggestion-title,
+                        .suggestion-description {
+                           color: var(--card-color-pastel-extra-light);
+                        }
+
+                        & .app {
+                           background: var(--log-background-app);
+                           color: var(--card-color-pastel-light)
+                        }
+
+                        & .interaction {
+                           background: var(--log-background);
+                           color: var(--card-color-pastel-extra-light);
+
+                           & .app {
+                              background: var(--log-background-app);
+                              color: var(--card-color-pastel-light);
+                           }
+
+                           & .description {
+                              color: var(--card-color-pastel-light);
+                           }
+                        }
+
+                        & .suggestion-actions {
+                           & .delete {
+                              display: none;
+                           }
+
+                           & .accept i:before {
+                              content: "\58";
+                           }
+                        }
+                     }
                   }
                }
 
                &#templateDay {
                   display: none;
+               }
+
+               & .suggestion-actions {
+                  display: none;
+                  position: absolute;
+                  top: 4px;
+                  right: 4px;
+                  gap: 4px;
+                  align-items: center;
+
+                  & button {
+                     width: 24px;
+                     height: 24px;
+                     display: flex;
+                     align-items: center;
+                     justify-content: center;
+                     border-radius: 50%;
+                     transition: background-color var(--transition-opts);
+
+                     &:hover {
+                        background-color: var(--button-background-active);
+                     }
+
+                     & i {
+                        font-size: 0.85rem;
+                        color: var(--card-color-pastel);
+                     }
+                  }
+               }
+
+               & .suggestion:hover .suggestion-actions {
+                  display: flex;
                }
             }
          }
